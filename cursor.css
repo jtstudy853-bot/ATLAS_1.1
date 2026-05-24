@@ -1,0 +1,524 @@
+/* ═══════════════════════════════════════════════════════════════
+   ALTAS — CURSOR SYSTEM
+   Custom cursor · All states · Transitions · Label · Ring lag
+   States: default · link · loading · blocked · text · grab ·
+           resize · zoom · thinking (AI streaming) · click
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────────────────────
+   1. HIDE NATIVE CURSOR GLOBALLY
+   ───────────────────────────────────────────────────────────── */
+
+/* Hide cursor everywhere on the app */
+#app,
+#app * {
+  cursor: none !important;
+}
+
+/* Restore native cursor inside input fields so
+   the text I-beam still functions natively as fallback —
+   our custom ibeam overlay replaces it visually */
+#app input,
+#app textarea,
+#app [contenteditable] {
+  cursor: none !important;
+  caret-color: var(--accent-bright);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   2. CURSOR ROOT CONTAINER
+   Fixed to viewport, above everything
+   ───────────────────────────────────────────────────────────── */
+
+#altas-cursor {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 99990;
+  overflow: hidden;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   3. DOT — Inner core, snaps instantly to mouse
+   ───────────────────────────────────────────────────────────── */
+
+#altas-cursor-dot {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);                  /* #7B6CFF */
+  pointer-events: none;
+  z-index: 52;
+
+  /* Center on cursor position */
+  transform: translate(-50%, -50%);
+
+  /* Smooth size + color transitions */
+  transition:
+    width      0.25s cubic-bezier(0.16,1,0.3,1),
+    height     0.25s cubic-bezier(0.16,1,0.3,1),
+    background 0.2s  ease,
+    opacity    0.2s  ease,
+    transform  0.15s cubic-bezier(0.16,1,0.3,1);
+
+  /* Start hidden until first mousemove */
+  opacity: 0;
+
+  /* Hardware-accelerate */
+  will-change: left, top, width, height, background, opacity;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   4. RING — Outer ring, lags behind with lerp in JS
+   ───────────────────────────────────────────────────────────── */
+
+#altas-cursor-ring {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border: 1.5px solid rgba(123,108,255,0.55);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 49;
+
+  /* Center on lerped position */
+  transform: translate(-50%, -50%);
+
+  /* Smooth morphing transitions */
+  transition:
+    width        0.3s cubic-bezier(0.16,1,0.3,1),
+    height       0.3s cubic-bezier(0.16,1,0.3,1),
+    border-color 0.3s ease,
+    border-radius 0.3s ease,
+    opacity      0.3s ease,
+    background   0.3s ease,
+    box-shadow   0.3s ease;
+
+  opacity: 0;
+  will-change: left, top, width, height, border-color, border-radius, opacity, box-shadow;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   5. I-BEAM — Custom text cursor shown on text/input hover
+   ───────────────────────────────────────────────────────────── */
+
+#altas-cursor-ibeam {
+  position: absolute;
+  pointer-events: none;
+  z-index: 51;
+
+  /* Center on exact cursor position */
+  transform: translate(-50%, -50%);
+
+  opacity: 0;
+  transition: opacity 0.18s ease;
+
+  /* Vertical flex column: top serif, stem, bottom serif */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cursor-ibeam-top,
+.cursor-ibeam-bottom {
+  width: 10px;
+  height: 2px;
+  background: var(--accent);
+  border-radius: 1px;
+}
+
+.cursor-ibeam-stem {
+  width: 2px;
+  height: 18px;
+  background: var(--accent);
+  border-radius: 1px;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   6. ZOOM-PLUS — Shown on zoom/expand areas
+   ───────────────────────────────────────────────────────────── */
+
+#altas-cursor-zoom {
+  position: absolute;
+  pointer-events: none;
+  z-index: 53;
+  transform: translate(-50%, -50%);
+
+  opacity: 0;
+  transition: opacity 0.18s ease;
+
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  line-height: 1;
+
+  /* Slight drop shadow for legibility */
+  text-shadow: 0 0 8px rgba(123,108,255,0.6);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   7. CURSOR LABEL — Floats below ring, shows symbol for states
+   e.g. ✕ for blocked, ⊕ for grab, ↔ for resize
+   ───────────────────────────────────────────────────────────── */
+
+#altas-cursor-label {
+  position: absolute;
+
+  /* Positioned just below the ring — JS offsets this */
+  transform: translateX(-50%);
+
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.85);
+
+  background: rgba(3,3,6,0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 0.5px solid var(--glass-border);
+  padding: 2px 7px;
+  border-radius: var(--r-sm);
+  white-space: nowrap;
+
+  pointer-events: none;
+  z-index: 60;
+
+  opacity: 0;
+  transition: opacity 0.18s ease;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   8. AI THINKING CURSOR — Shown while ALTAS is streaming
+   Replaces default dot+ring with a breathing violet orb
+   ───────────────────────────────────────────────────────────── */
+
+#altas-cursor-thinking {
+  position: absolute;
+  pointer-events: none;
+  z-index: 54;
+  transform: translate(-50%, -50%);
+
+  opacity: 0;
+  transition: opacity 0.3s ease;
+
+  /* Orb shape */
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%,
+    rgba(123,108,255,0.3),
+    rgba(123,108,255,0.08)
+  );
+  border: 1px solid rgba(123,108,255,0.4);
+  box-shadow:
+    0 0 16px rgba(123,108,255,0.2),
+    0 0 32px rgba(123,108,255,0.08),
+    inset 0 0 12px rgba(123,108,255,0.1);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Spinner inside thinking orb */
+#altas-cursor-thinking::before {
+  content: '';
+  width: 14px;
+  height: 14px;
+  border: 1.5px solid rgba(123,108,255,0.25);
+  border-top-color: var(--accent-bright);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+
+/* When AI is thinking, breathing animation on the orb */
+#altas-cursor.state-thinking #altas-cursor-thinking {
+  animation: cursor-think-breathe 1.8s ease-in-out infinite;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   9. CLICK RIPPLE — Burst effect on mousedown
+   ───────────────────────────────────────────────────────────── */
+
+.cursor-click-ripple {
+  position: absolute;
+  pointer-events: none;
+  z-index: 48;
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  background: transparent;
+  border: 1px solid rgba(123,108,255,0.6);
+  animation: cursor-ripple 0.45s cubic-bezier(0.16,1,0.3,1) forwards;
+  will-change: transform, opacity;
+}
+
+@keyframes cursor-ripple {
+  from {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0.8;
+    width: 10px;
+    height: 10px;
+  }
+  to {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0;
+    width: 48px;
+    height: 48px;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   10. STATE CLASSES — Applied to #altas-cursor by cursor.js
+   These classes control which sub-elements are visible and
+   how the ring/dot morph per state.
+   ───────────────────────────────────────────────────────────── */
+
+/* ── STATE: default ── */
+#altas-cursor.state-default #altas-cursor-dot {
+  width: 7px;
+  height: 7px;
+  background: var(--accent);
+  opacity: 1;
+}
+
+#altas-cursor.state-default #altas-cursor-ring {
+  width: 28px;
+  height: 28px;
+  border-color: rgba(123,108,255,0.55);
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: none;
+  opacity: 1;
+}
+
+/* ── STATE: link (hover over clickable elements) ── */
+#altas-cursor.state-link #altas-cursor-dot {
+  width: 7px;
+  height: 7px;
+  background: var(--accent);
+  opacity: 1;
+}
+
+#altas-cursor.state-link #altas-cursor-ring {
+  width: 34px;
+  height: 34px;
+  border-color: rgba(123,108,255,0.95);
+  border-radius: 50%;
+  background: rgba(123,108,255,0.04);
+  box-shadow:
+    0 0 10px 3px rgba(123,108,255,0.45),
+    0 0 22px 6px rgba(123,108,255,0.2);
+  opacity: 1;
+  animation: cursor-link-glow 1.8s ease-in-out infinite;
+}
+
+/* ── STATE: loading (AI streaming) ── */
+#altas-cursor.state-loading #altas-cursor-dot {
+  width: 5px;
+  height: 5px;
+  background: var(--accent);
+  opacity: 1;
+}
+
+#altas-cursor.state-loading #altas-cursor-ring {
+  width: 32px;
+  height: 32px;
+  border-color: rgba(123,108,255,0.7);
+  border-top-color: transparent;
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: none;
+  opacity: 1;
+  /* JS drives the rotation via spinAngle */
+}
+
+/* ── STATE: blocked (disabled buttons, etc.) ── */
+#altas-cursor.state-blocked #altas-cursor-dot {
+  width: 7px;
+  height: 7px;
+  background: #FF5050;
+  opacity: 1;
+}
+
+#altas-cursor.state-blocked #altas-cursor-ring {
+  width: 30px;
+  height: 30px;
+  border-color: rgba(255,80,80,0.7);
+  border-radius: 50%;
+  background: rgba(255,80,80,0.06);
+  box-shadow: none;
+  opacity: 1;
+}
+
+/* ── STATE: text (inputs, textareas, contenteditable) ── */
+#altas-cursor.state-text #altas-cursor-dot {
+  width: 4px;
+  height: 4px;
+  background: var(--accent);
+  opacity: 0.7;
+}
+
+#altas-cursor.state-text #altas-cursor-ring {
+  width: 26px;
+  height: 36px;
+  border-color: rgba(123,108,255,0.45);
+  border-radius: 50%;
+  background: rgba(123,108,255,0.05);
+  box-shadow: none;
+  opacity: 1;
+}
+
+#altas-cursor.state-text #altas-cursor-ibeam {
+  opacity: 1;
+}
+
+/* ── STATE: grab (draggable elements) ── */
+#altas-cursor.state-grab #altas-cursor-dot {
+  width: 8px;
+  height: 8px;
+  background: #FFB43C;
+  opacity: 1;
+}
+
+#altas-cursor.state-grab #altas-cursor-ring {
+  width: 36px;
+  height: 36px;
+  border-color: rgba(255,180,60,0.6);
+  border-radius: 50%;
+  background: rgba(255,180,60,0.05);
+  box-shadow: none;
+  opacity: 1;
+}
+
+/* ── STATE: resize ── */
+#altas-cursor.state-resize #altas-cursor-dot {
+  width: 5px;
+  height: 5px;
+  background: #C88CFF;
+  opacity: 1;
+}
+
+#altas-cursor.state-resize #altas-cursor-ring {
+  width: 26px;
+  height: 26px;
+  border-color: rgba(200,140,255,0.7);
+  border-radius: 3px;           /* Square-ish for resize */
+  background: transparent;
+  box-shadow: none;
+  opacity: 1;
+}
+
+/* ── STATE: zoom ── */
+#altas-cursor.state-zoom #altas-cursor-dot {
+  opacity: 0;                   /* Dot hidden, zoom+ takes over */
+}
+
+#altas-cursor.state-zoom #altas-cursor-ring {
+  width: 34px;
+  height: 34px;
+  border-color: rgba(123,108,255,0.55);
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: none;
+  opacity: 1;
+}
+
+#altas-cursor.state-zoom #altas-cursor-zoom {
+  opacity: 1;
+}
+
+/* ── STATE: thinking (AI is generating a response) ── */
+#altas-cursor.state-thinking #altas-cursor-dot {
+  opacity: 0;
+}
+
+#altas-cursor.state-thinking #altas-cursor-ring {
+  opacity: 0;
+}
+
+#altas-cursor.state-thinking #altas-cursor-thinking {
+  opacity: 1;
+}
+
+/* ── STATE: click (transient — removed after animation) ── */
+#altas-cursor.state-click #altas-cursor-dot {
+  transform: translate(-50%, -50%) scale(0.6);
+  background: var(--accent-bright);
+}
+
+#altas-cursor.state-click #altas-cursor-ring {
+  width: 22px;
+  height: 22px;
+  border-color: rgba(123,108,255,0.9);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   11. CURSOR HIDDEN — When cursor leaves the app window
+   ───────────────────────────────────────────────────────────── */
+
+#altas-cursor.hidden #altas-cursor-dot,
+#altas-cursor.hidden #altas-cursor-ring,
+#altas-cursor.hidden #altas-cursor-ibeam,
+#altas-cursor.hidden #altas-cursor-zoom,
+#altas-cursor.hidden #altas-cursor-thinking,
+#altas-cursor.hidden #altas-cursor-label {
+  opacity: 0 !important;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   12. TOUCH DEVICES — Restore native cursor, hide custom
+   ───────────────────────────────────────────────────────────── */
+
+@media (hover: none) and (pointer: coarse) {
+  #altas-cursor {
+    display: none;
+  }
+
+  #app,
+  #app * {
+    cursor: auto !important;
+  }
+
+  #app button,
+  #app a,
+  #app [role="button"] {
+    cursor: pointer !important;
+  }
+
+  #app input,
+  #app textarea {
+    cursor: text !important;
+  }
+
+  #app [disabled] {
+    cursor: not-allowed !important;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   13. DATA ATTRIBUTES — Applied to elements so cursor.js
+   can detect what cursor state to apply without checking
+   tag names / computed styles
+   ───────────────────────────────────────────────────────────── */
+
+/*
+  Add these data attributes in HTML or via JS:
+
+  data-cursor="default"   → violet dot + ring
+  data-cursor="link"      → glow ring (all buttons, chips, nav)
+  data-cursor="loading"   → spinning ring (AI streaming)
+  data-cursor="blocked"   → red ring (disabled elements)
+  data-cursor="text"      → I-beam (inputs, textareas)
+  data-cursor="grab"      → amber ring (draggable)
+  data-cursor="resize"    → square ring, purple
+  data-cursor="zoom"      → plus sign
+  data-cursor="thinking"  → breathing violet orb (AI generating)
+
+  cursor.js reads element.dataset.cursor OR infers state from:
+  - disabled → blocked
+  - button/a/[role=button] → link
+  - input/textarea → text
+  - [data-draggable] → grab
+*/

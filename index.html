@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="ALTAS — Adaptive Logical Tactical Autonomous Sentinel. Your personal AI second brain." />
+  <meta name="theme-color" content="#030306" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="ALTAS" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="ALTAS — Personal AI" />
+  <meta property="og:description" content="Your adaptive intelligence system." />
+  <meta property="og:type" content="website" />
+
+  <title>ALTAS — Personal AI</title>
+
+  <!-- Preconnect for fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+  <!-- CSS load order matters -->
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/layout.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/chat.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+
+  <!-- Inline critical: prevent flash -->
+  <style>
+    html { background: #030306; }
+    #app { opacity: 0; }
+    #app.booted { opacity: 1; transition: opacity 0.6s cubic-bezier(0.16,1,0.3,1); }
+    .boot-screen {
+      position: fixed; inset: 0; z-index: 99999;
+      background: #030306;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 24px;
+      transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1),
+                  visibility 0.8s;
+    }
+    .boot-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+    .boot-logo-svg { animation: boot-pulse 1.4s ease-in-out infinite; }
+    @keyframes boot-pulse {
+      0%,100% { opacity: 0.6; transform: scale(0.97); }
+      50%      { opacity: 1;   transform: scale(1);    }
+    }
+    .boot-bar {
+      width: 160px; height: 1px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 999px; overflow: hidden;
+    }
+    .boot-bar-fill {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, #4A3FCC, #7B6CFF, #9B8FFF);
+      border-radius: 999px;
+      transition: width 0.4s cubic-bezier(0.16,1,0.3,1);
+    }
+    .boot-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px; letter-spacing: 0.12em;
+      text-transform: uppercase; color: rgba(255,255,255,0.25);
+    }
+  </style>
+</head>
+
+<body class="grain">
+
+<!-- ═══════════════════════════════════════════════════════════
+     BOOT SCREEN — shown while JS initialises
+     ═══════════════════════════════════════════════════════════ -->
+<div id="boot-screen" class="boot-screen" role="status" aria-label="ALTAS loading">
+  <svg class="boot-logo-svg" width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <!-- Outer hex -->
+    <polygon points="28,3 51,16 51,40 28,53 5,40 5,16"
+      fill="none" stroke="rgba(123,108,255,0.35)" stroke-width="0.75"/>
+    <!-- Mid hex -->
+    <polygon points="28,9 45,19 45,37 28,47 11,37 11,19"
+      fill="none" stroke="rgba(123,108,255,0.2)" stroke-width="0.75"/>
+    <!-- Inner hex filled -->
+    <polygon points="28,15 39,21.5 39,34.5 28,41 17,34.5 17,21.5"
+      fill="rgba(123,108,255,0.06)" stroke="rgba(123,108,255,0.4)" stroke-width="0.75"/>
+    <!-- Core -->
+    <circle cx="28" cy="28" r="5.5" fill="#7B6CFF" opacity="0.9"/>
+    <circle cx="28" cy="28" r="3"   fill="#C4BFFF"/>
+    <!-- Vertex dots -->
+    <circle cx="28"  cy="3"  r="1.5" fill="rgba(123,108,255,0.7)"/>
+    <circle cx="51"  cy="16" r="1.5" fill="rgba(123,108,255,0.5)"/>
+    <circle cx="51"  cy="40" r="1.5" fill="rgba(123,108,255,0.5)"/>
+    <circle cx="28"  cy="53" r="1.5" fill="rgba(123,108,255,0.7)"/>
+    <circle cx="5"   cy="40" r="1.5" fill="rgba(123,108,255,0.5)"/>
+    <circle cx="5"   cy="16" r="1.5" fill="rgba(123,108,255,0.5)"/>
+  </svg>
+  <div class="boot-bar"><div class="boot-bar-fill" id="boot-bar-fill"></div></div>
+  <div class="boot-label" id="boot-label">Initialising</div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     APP ROOT
+     ═══════════════════════════════════════════════════════════ -->
+<div id="app" role="application" aria-label="ALTAS Personal AI">
+
+  <!-- Mobile sidebar overlay/backdrop -->
+  <div
+    id="sidebar-overlay"
+    aria-hidden="true"
+    role="presentation"
+  ></div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       SIDEBAR
+       ══════════════════════════════════════════════════════════ -->
+  <aside
+    id="sidebar"
+    aria-label="Navigation and conversation history"
+    data-state="open"
+  >
+
+    <!-- ── Sidebar: Logo / brand ── -->
+    <div class="sidebar-header" role="banner">
+      <div class="logo-mark" aria-hidden="true">
+        <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="18,2 32,10 32,26 18,34 4,26 4,10"
+            fill="none" stroke="rgba(123,108,255,0.45)" stroke-width="0.75"/>
+          <polygon points="18,7 27,12 27,24 18,29 9,24 9,12"
+            fill="rgba(123,108,255,0.07)" stroke="rgba(123,108,255,0.28)" stroke-width="0.75"/>
+          <circle cx="18" cy="18" r="4.5" fill="#7B6CFF" opacity="0.95"/>
+          <circle cx="18" cy="18" r="2.5" fill="#C4BFFF"/>
+          <circle cx="18" cy="2"  r="1.2" fill="rgba(155,143,255,0.65)"/>
+          <circle cx="32" cy="10" r="1.2" fill="rgba(155,143,255,0.45)"/>
+          <circle cx="32" cy="26" r="1.2" fill="rgba(155,143,255,0.45)"/>
+          <circle cx="18" cy="34" r="1.2" fill="rgba(155,143,255,0.65)"/>
+          <circle cx="4"  cy="26" r="1.2" fill="rgba(155,143,255,0.45)"/>
+          <circle cx="4"  cy="10" r="1.2" fill="rgba(155,143,255,0.45)"/>
+        </svg>
+      </div>
+      <div class="logo-text">
+        <div class="logo-name" aria-label="ALTAS">ALTAS</div>
+        <div class="logo-tagline">
+          <span>Adaptive</span>
+          <span class="logo-tagline-sep" aria-hidden="true">·</span>
+          <span>Logical</span>
+          <span class="logo-tagline-sep" aria-hidden="true">·</span>
+          <span>Tactical</span>
+        </div>
+      </div>
+
+      <!-- Collapse sidebar button (desktop) -->
+      <button
+        class="sidebar-collapse-btn"
+        id="btn-sidebar-collapse"
+        aria-label="Collapse sidebar"
+        title="Collapse sidebar"
+      >
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
+          stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+          <path d="M9 2L4 7l5 5"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- ── Sidebar: New chat CTA ── -->
+    <div class="sidebar-new-chat-wrap">
+      <button
+        class="btn-new-chat"
+        id="btn-new-chat"
+        aria-label="Start a new conversation"
+        data-shortcut="⌘ K"
+      >
+        <span class="btn-new-chat-icon" aria-hidden="true">
+          <!-- Plus icon -->
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
+            stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+            <line x1="7" y1="2" x2="7" y2="12"/>
+            <line x1="2" y1="7" x2="12" y2="7"/>
+          </svg>
+        </span>
+        <span class="btn-new-chat-label">New conversation</span>
+        <span class="btn-new-chat-shortcut" aria-hidden="true">⌘ K</span>
+      </button>
+    </div>
+
+    <!-- ── Sidebar: Search conversations ── -->
+    <div class="sidebar-search-wrap">
+      <div class="sidebar-search" role="search">
+        <span class="sidebar-search-icon" aria-hidden="true">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"
+            stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+            <circle cx="5" cy="5" r="3.5"/>
+            <line x1="7.5" y1="7.5" x2="11" y2="11"/>
+          </svg>
+        </span>
+        <input
+          type="search"
+          id="conv-search"
+          class="sidebar-search-input"
+          placeholder="Search conversations…"
+          aria-label="Search conversations"
+          autocomplete="off"
+          spellcheck="false"
+        />
+      </div>
+    </div>
+
+    <!-- ── Sidebar: Today's chats ── -->
+    <div class="conv-group" id="conv-group-today">
+      <div class="sidebar-section-label" id="label-today">Today</div>
+      <nav
+        class="conversation-list"
+        id="conversation-list-today"
+        aria-label="Today's conversations"
+        role="list"
+      >
+        <!-- Populated dynamically by chat.js -->
+        <!-- Placeholder shown before any chats exist -->
+        <div class="conv-empty" id="conv-empty-today" aria-live="polite">
+          <span>No conversations yet</span>
+        </div>
+      </nav>
+    </div>
+
+    <!-- ── Sidebar: Earlier chats ── -->
+    <div class="conv-group" id="conv-group-earlier" style="display:none;">
+      <div class="sidebar-section-label">Earlier</div>
+      <nav
+        class="conversation-list"
+        id="conversation-list-earlier"
+        aria-label="Earlier conversations"
+        role="list"
+      >
+      </nav>
+    </div>
+
+    <!-- ── Sidebar: Spacer ── -->
+    <div class="sidebar-spacer" aria-hidden="true"></div>
+
+    <!-- ── Sidebar: Capabilities quick-links ── -->
+    <div class="sidebar-capabilities">
+      <div class="sidebar-section-label">Capabilities</div>
+      <div class="capability-grid" role="list">
+
+        <button class="capability-item" role="listitem"
+          data-action="capability" data-cap="memory"
+          aria-label="Memory Bank — coming soon" disabled>
+          <span class="capability-icon" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
+              stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="1" y="3" width="12" height="8" rx="1.5"/>
+              <circle cx="4" cy="7" r="1"/>
+              <circle cx="7" cy="7" r="1"/>
+              <circle cx="10" cy="7" r="1"/>
+            </svg>
+          </span>
+          <span class="capability-label">Memory</span>
+          <span class="capability-badge">Soon</span>
+        </button>
+
+        <button class="capability-item" role="listitem"
+          data-action="capability" data-cap="files"
+          aria-label="File upload — coming soon" disabled>
+          <span class="capability-icon" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
+              stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M8 1H3a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V6L8 1z"/>
+              <path d="M8 1v5h4"/>
+            </svg>
+          </span>
+          <span class="capability-label">Files</span>
+          <span class="capability-badge">Soon</span>
+        </button>
+
+        <button class="capability-item" role="listitem"
+          data-action="capability" data-cap="notion"
+          aria-label="Notion integration — coming soon" disabled>
+          <span class="capability-icon" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
+              stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="1" y="1" width="12" height="12" rx="2"/>
+              <line x1="4" y1="5" x2="10" y2="5"/>
+              <line x1="4" y1="7.5" x2="8" y2="7.5"/>
+              <line x1="4" y1="10" x2="7" y2="10"/>
+            </svg>
+          </span>
+          <span class="capability-label">Notion</span>
+          <span class="capability-badge">Soon</span>
+        </button>
+
+        <button class="capability-item" role="listitem"
+          data-action="capability" data-cap="web"
+          aria-label="Web search — coming soon" disabled>
+          <span class="capability-icon" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
+              stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="7" cy="7" r="5.5"/>
+              <path d="M7 1.5C7 1.5 5 4 5 7s2 5.5 2 5.5"/>
+              <path d="M7 1.5C7 1.5 9 4 9 7s-2 5.5-2 5.5"/>
+              <line x1="1.5" y1="7" x2="12.5" y2="7"/>
+            </svg>
+          </span>
+          <span class="capability-label">Web</span>
+          <span class="capability-badge">Soon</span>
+        </button>
+
+      </div>
+    </div>
+
+    <!-- ── Sidebar: Footer / status ── -->
+    <footer class="sidebar-footer" aria-label="System status">
+
+      <div class="sidebar-footer-row">
+        <div class="status-indicator" id="status-indicator" role="status" aria-live="polite">
+          <div class="status-dot" id="status-dot"></div>
+          <span class="status-text" id="status-text">Connecting…</span>
+        </div>
+        <button class="icon-btn" id="btn-settings"
+          aria-label="Settings" title="Settings">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"
+            stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="6.5" cy="6.5" r="2"/>
+            <path d="M6.5 1v1.5M6.5 10.5V12M12 6.5h-1.5M2.5 6.5H1
+                     M10.3 2.7l-1.1 1.1M3.8 9.2l-1.1 1.1
+                     M10.3 10.3l-1.1-1.1M3.8 3.8L2.7 2.7"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="model-badge" aria-label="AI model in use">
+        <div class="model-badge-dot" aria-hidden="true"></div>
+        <span>claude-haiku-4-5</span>
+        <span class="model-badge-tier">· haiku</span>
+      </div>
+
+      <div class="sidebar-version" aria-label="Version">
+        <span class="t-mono dimmed">ALTAS v1.0.0</span>
+        <span class="sidebar-version-sep" aria-hidden="true">·</span>
+        <span class="t-mono dimmed" id="session-count">0 messages</span>
+      </div>
+
+    </footer>
+
+  </aside>
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       MAIN PANEL
+       ══════════════════════════════════════════════════════════ -->
+  <main id="main" aria-label="Conversation area">
+
+    <!-- ── Header ── -->
+    <header id="header" aria-label="Conversation header">
+
+      <div class="header-left">
+        <!-- Mobile: toggle sidebar -->
+        <button
+          class="sidebar-toggle"
+          id="sidebar-toggle"
+          aria-label="Toggle navigation sidebar"
+          aria-expanded="false"
+          aria-controls="sidebar"
+        >
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"
+            stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <line x1="2" y1="5"  x2="16" y2="5"/>
+            <line x1="2" y1="9"  x2="16" y2="9"/>
+            <line x1="2" y1="13" x2="16" y2="13"/>
+          </svg>
+        </button>
+
+        <!-- Breadcrumb / title -->
+        <div class="header-breadcrumb" aria-label="Current conversation">
+          <span class="header-breadcrumb-root muted">ALTAS</span>
+          <span class="header-breadcrumb-sep muted" aria-hidden="true">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"
+              stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
+              <path d="M3 2l4 3-4 3"/>
+            </svg>
+          </span>
+          <span
+            class="header-title-text"
+            id="header-chat-title"
+            aria-live="polite"
+            aria-label="Conversation title"
+          >New conversation</span>
+        </div>
+      </div>
+
+      <div class="header-center" aria-hidden="true">
+        <!-- Token / context indicator -->
+        <div class="context-meter" id="context-meter" title="Context usage">
+          <div class="context-meter-bar">
+            <div class="context-meter-fill" id="context-fill" style="width: 0%"></div>
+          </div>
+          <span class="context-meter-label" id="context-label">0 tokens</span>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <!-- Thinking toggle -->
+        <div class="header-toggle-group" role="group" aria-label="Mode toggles">
+          <button
+            class="header-mode-btn"
+            id="btn-mode-precise"
+            data-mode="precise"
+            aria-label="Precise mode"
+            title="Precise — lower temperature"
+            aria-pressed="false"
+          >
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"
+              stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
+              <circle cx="6.5" cy="6.5" r="5"/>
+              <line x1="6.5" y1="3" x2="6.5" y2="6.5"/>
+              <circle cx="6.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/>
+            </svg>
+            Precise
+          </button>
+          <button
+            class="header-mode-btn active"
+            id="btn-mode-balanced"
+            data-mode="balanced"
+            aria-label="Balanced mode"
+            title="Balanced — default"
+            aria-pressed="true"
+          >
+            Balanced
+          </button>
+          <button
+            class="header-mode-btn"
+            id="btn-mode-creative"
+            data-mode="creative"
+            aria-label="Creative mode"
+            title="Creative — higher temperature"
+            aria-pressed="false"
+          >
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"
+              stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6.5 1C6.5 1 4 3.5 4 6a2.5 2.5 0 005 0C9 3.5 6.5 1 6.5 1z"/>
+              <line x1="6.5" y1="8.5" x2="6.5" y2="12"/>
+            </svg>
+            Creative
+          </button>
+        </div>
+
+        <div class="header-divider" aria-hidden="true"></div>
+
+        <!-- Export -->
+        <button
+          class="header-btn"
+          id="btn-export"
+          aria-label="Export conversation as markdown"
+          title="Export conversation"
+        >
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
+            stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 1v8M4 6l3 3 3-3"/>
+            <path d="M2 11h10"/>
+          </svg>
+        </button>
+
+        <!-- Clear chat -->
+        <button
+          class="header-btn"
+          id="btn-clear"
+          aria-label="Clear current conversation"
+          title="Clear conversation"
+        >
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
+            stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 3h10M5 3V2h4v1M11 3l-.8 9H3.8L3 3"/>
+            <line x1="5.5" y1="6" x2="5.5" y2="10"/>
+            <line x1="8.5" y1="6" x2="8.5" y2="10"/>
+          </svg>
+        </button>
+
+      </div>
+    </header>
+
+
+    <!-- ── Chat scroll area ── -->
+    <div
+      id="chat-area"
+      role="log"
+      aria-live="polite"
+      aria-atomic="false"
+      aria-label="Conversation messages"
+      tabindex="0"
+    >
+      <div class="chat-inner" id="chat-inner">
+
+        <!-- ──────────────────────────────────────────────────
+             WELCOME SCREEN
+             Shown when no messages exist
+             ────────────────────────────────────────────────── -->
+        <section id="welcome" aria-label="Welcome to ALTAS" aria-hidden="false">
+
+          <!-- Animated orb -->
+          <div class="welcome-orb-wrap" aria-hidden="true">
+            <div class="welcome-orb-orbit welcome-orb-orbit--outer">
+              <div class="welcome-orb-orbit-dot"></div>
+            </div>
+            <div class="welcome-orb-orbit welcome-orb-orbit--mid">
+              <div class="welcome-orb-orbit-dot"></div>
+            </div>
+            <div class="welcome-orb-core">
+              <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                <polygon points="14,2 25,8 25,20 14,26 3,20 3,8"
+                  fill="none" stroke="rgba(123,108,255,0.55)" stroke-width="0.75"/>
+                <circle cx="14" cy="14" r="5" fill="#7B6CFF" opacity="0.9"/>
+                <circle cx="14" cy="14" r="2.8" fill="#C4BFFF"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Greeting text -->
+          <div class="welcome-text-block">
+            <p class="welcome-eyebrow t-mono muted">
+              System online · All systems nominal
+            </p>
+            <h1 class="welcome-title">
+              Hello. I'm <em>ALTAS</em>
+            </h1>
+            <p class="welcome-subtitle">
+              Adaptive · Logical · Tactical · Autonomous · Sentinel
+            </p>
+            <p class="welcome-body muted">
+              Your personal intelligence system. Ask me anything —
+              I reason deeply, respond precisely, and adapt to how you think.
+            </p>
+          </div>
+
+          <!-- Capability pills -->
+          <div class="welcome-pills" aria-label="What ALTAS can do" role="list">
+            <div class="welcome-pill" role="listitem">
+              <span class="welcome-pill-icon" aria-hidden="true">
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none"
+                  stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6.5 1L8.5 5l4.5.5-3.3 3.1.8 4.4L6.5 11 2 13l.8-4.4L-.5 5.5 4 5z"/>
+                </svg>
+              </span>
+              Deep reasoning
+            </div>
+            <div class="welcome-pill" role="listitem">
+              <span class="welcome-pill-icon" aria-hidden="true">
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none"
+                  stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="1" y="3" width="11" height="7" rx="1.5"/>
+                  <line x1="4" y1="6.5" x2="9" y2="6.5"/>
+                  <line x1="6.5" y1="4" x2="6.5" y2="9"/>
+                </svg>
+              </span>
+              Structured output
+            </div>
+            <div class="welcome-pill" role="listitem">
+              <span class="welcome-pill-icon" aria-hidden="true">
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none"
+                  stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="6.5" cy="6.5" r="5"/>
+                  <path d="M6.5 3.5v3l2 2"/>
+                </svg>
+              </span>
+              Streaming answers
+            </div>
+            <div class="welcome-pill" role="listitem">
+              <span class="welcome-pill-icon" aria-hidden="true">
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none"
+                  stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M2 10l3-3 2 2 4-6"/>
+                </svg>
+              </span>
+              Code &amp; analysis
+            </div>
+          </div>
+
+          <!-- Suggestion chips -->
+          <div class="welcome-chips-label t-xs muted" aria-hidden="true">
+            Try asking
+          </div>
+          <div
+            class="welcome-chips"
+            id="welcome-chips"
+            role="list"
+            aria-label="Suggested prompts"
+          >
+            <button
+              class="chip"
+              role="listitem"
+              data-prompt="What can you help me with? Give me a detailed breakdown of your capabilities."
+              aria-label="Suggested prompt: What can you do?"
+            >
+              <span class="chip-icon" aria-hidden="true">⬡</span>
+              What can you do?
+            </button>
+
+            <button
+              class="chip"
+              role="listitem"
+              data-prompt="Explain how to build a second brain using Notion and an AI assistant like ALTAS. Give me a step-by-step system."
+              aria-label="Suggested prompt: Second brain setup"
+            >
+              <span class="chip-icon" aria-hidden="true">⬡</span>
+              Second brain setup
+            </button>
+
+            <button
+              class="chip"
+              role="listitem"
+              data-prompt="Design a productivity system for a university student that integrates note-taking, task management, and AI assistance."
+              aria-label="Suggested prompt: Productivity system"
+            >
+              <span class="chip-icon" aria-hidden="true">⬡</span>
+              Productivity system
+            </button>
+
+            <button
+              class="chip"
+              role="listitem"
+              data-prompt="Summarise the key ideas and frameworks from 'Building a Second Brain' by Tiago Forte. Include the CODE method and PARA system."
+              aria-label="Suggested prompt: Building a Second Brain summary"
+            >
+              <span class="chip-icon" aria-hidden="true">⬡</span>
+              Building a Second Brain
+            </button>
+
+            <button
+              class="chip"
+              role="listitem"
+              data-prompt="What is the most effective way to learn a complex technical subject from scratch? Give me a structured learning roadmap."
+              aria-label="Suggested prompt: Learning strategy"
+            >
+              <span class="chip-icon" aria-hidden="true">⬡</span>
+              Learning strategy
+            </button>
+
+            <button
+              class="chip"
+              role="listitem"
+              data-prompt="Write a Python function that implements binary search with full type annotations, docstring, and unit tests."
+              aria-label="Suggested prompt: Python coding"
+            >
+              <span class="chip-icon" aria-hidden="true">⬡</span>
+              Python + unit tests
+            </button>
+          </div>
+
+          <!-- Keyboard shortcut hint -->
+          <div class="welcome-shortcut-hint t-mono muted" aria-hidden="true">
+            <kbd>↵</kbd> to send &nbsp;·&nbsp;
+            <kbd>⌘K</kbd> new chat &nbsp;·&nbsp;
+            <kbd>⌘⇧C</kbd> copy last
+          </div>
+
+        </section>
+        <!-- /welcome -->
+
+        <!-- Messages are injected here by chat.js -->
+
+      </div>
+      <!-- /chat-inner -->
+    </div>
+    <!-- /chat-area -->
+
+
+    <!-- ── Input zone ── -->
+    <div id="input-zone" role="complementary" aria-label="Message input area">
+      <div class="input-zone-inner">
+
+        <!-- Attachment preview strip (hidden until file attached) -->
+        <div
+          class="attachment-strip"
+          id="attachment-strip"
+          aria-live="polite"
+          aria-label="Attached files"
+          hidden
+        >
+          <!-- Populated by ui.js when files attached -->
+        </div>
+
+        <!-- Main input shell -->
+        <div class="input-shell" id="input-shell" role="form" aria-label="Compose message">
+
+          <!-- Left: attach / tools buttons -->
+          <div class="input-left-actions" aria-label="Input tools">
+            <button
+              class="input-action-btn"
+              id="btn-attach"
+              aria-label="Attach file (coming soon)"
+              title="Attach file — coming soon"
+              disabled
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
+                stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 8.5l-6 6a4 4 0 01-5.7-5.6L8.5 2.8a2.5 2.5 0 013.5 3.5L5.8 12.4a1 1 0 01-1.4-1.4l6.2-6.2"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Centre: textarea -->
+          <textarea
+            id="prompt-input"
+            name="prompt"
+            placeholder="Ask ALTAS anything…"
+            rows="1"
+            aria-label="Type your message"
+            aria-required="true"
+            aria-multiline="true"
+            autocomplete="off"
+            autocorrect="on"
+            autocapitalize="sentences"
+            spellcheck="true"
+            maxlength="32000"
+          ></textarea>
+
+          <!-- Right: send button -->
+          <button
+            class="btn-send"
+            id="btn-send"
+            aria-label="Send message"
+            aria-disabled="true"
+            disabled
+            type="button"
+          >
+            <!-- Arrow right icon (idle) -->
+            <span class="btn-send-icon btn-send-icon--send" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"
+                stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M15 9H3M9.5 3.5L15 9l-5.5 5.5"/>
+              </svg>
+            </span>
+            <!-- Stop icon (streaming) -->
+            <span class="btn-send-icon btn-send-icon--stop" aria-hidden="true" style="display:none;">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <rect x="4" y="4" width="8" height="8" rx="1.5"/>
+              </svg>
+            </span>
+          </button>
+
+        </div>
+        <!-- /input-shell -->
+
+        <!-- Input meta bar -->
+        <div class="input-meta" aria-hidden="true">
+          <div class="input-meta-left">
+            <span class="input-hint" id="input-hint">
+              <kbd class="kbd">↵</kbd> send &nbsp;
+              <kbd class="kbd">⇧↵</kbd> newline
+            </span>
+          </div>
+          <div class="input-meta-right">
+            <span class="char-count" id="char-count" aria-live="polite" aria-label="Character count"></span>
+            <span class="input-meta-sep" aria-hidden="true">·</span>
+            <span class="input-mode-indicator t-mono muted" id="input-mode">balanced</span>
+          </div>
+        </div>
+
+        <!-- Disclaimer -->
+        <p class="input-disclaimer t-mono muted" aria-label="Disclaimer">
+          ALTAS may make mistakes. Verify important information.
+        </p>
+
+      </div>
+      <!-- /input-zone-inner -->
+    </div>
+    <!-- /input-zone -->
+
+  </main>
+  <!-- /main -->
+
+</div>
+<!-- /app -->
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     TOAST NOTIFICATION CONTAINER
+     ═══════════════════════════════════════════════════════════ -->
+<div
+  id="toast-container"
+  role="alert"
+  aria-live="assertive"
+  aria-atomic="true"
+  aria-label="Notifications"
+></div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     KEYBOARD SHORTCUT OVERLAY (⌘ /)
+     ═══════════════════════════════════════════════════════════ -->
+<div
+  id="shortcuts-overlay"
+  class="overlay"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Keyboard shortcuts"
+  hidden
+>
+  <div class="overlay-backdrop" id="shortcuts-backdrop"></div>
+  <div class="overlay-panel">
+    <div class="overlay-header">
+      <h2 class="overlay-title">Keyboard shortcuts</h2>
+      <button class="overlay-close" id="shortcuts-close" aria-label="Close shortcuts">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
+          stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <line x1="2" y1="2" x2="12" y2="12"/>
+          <line x1="12" y1="2" x2="2" y2="12"/>
+        </svg>
+      </button>
+    </div>
+    <div class="overlay-body">
+      <div class="shortcut-grid">
+        <div class="shortcut-item">
+          <span class="shortcut-label">New conversation</span>
+          <span class="shortcut-keys"><kbd>⌘</kbd><kbd>K</kbd></span>
+        </div>
+        <div class="shortcut-item">
+          <span class="shortcut-label">Send message</span>
+          <span class="shortcut-keys"><kbd>↵</kbd></span>
+        </div>
+        <div class="shortcut-item">
+          <span class="shortcut-label">New line</span>
+          <span class="shortcut-keys"><kbd>⇧</kbd><kbd>↵</kbd></span>
+        </div>
+        <div class="shortcut-item">
+          <span class="shortcut-label">Copy last response</span>
+          <span class="shortcut-keys"><kbd>⌘</kbd><kbd>⇧</kbd><kbd>C</kbd></span>
+        </div>
+        <div class="shortcut-item">
+          <span class="shortcut-label">Clear conversation</span>
+          <span class="shortcut-keys"><kbd>⌘</kbd><kbd>⇧</kbd><kbd>X</kbd></span>
+        </div>
+        <div class="shortcut-item">
+          <span class="shortcut-label">Focus input</span>
+          <span class="shortcut-keys"><kbd>⌘</kbd><kbd>L</kbd></span>
+        </div>
+        <div class="shortcut-item">
+          <span class="shortcut-label">Show shortcuts</span>
+          <span class="shortcut-keys"><kbd>⌘</kbd><kbd>/</kbd></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     SETTINGS PANEL (slide-in from right)
+     ═══════════════════════════════════════════════════════════ -->
+<div
+  id="settings-panel"
+  class="settings-panel"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Settings"
+  hidden
+>
+  <div class="settings-backdrop" id="settings-backdrop"></div>
+  <div class="settings-drawer">
+    <div class="settings-header">
+      <h2 class="settings-title">Settings</h2>
+      <button class="overlay-close" id="settings-close" aria-label="Close settings">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
+          stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <line x1="2" y1="2" x2="12" y2="12"/>
+          <line x1="12" y1="2" x2="2" y2="12"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="settings-body">
+      <!-- Backend URL -->
+      <div class="settings-group">
+        <label class="settings-label" for="setting-backend-url">Backend URL</label>
+        <p class="settings-desc muted">Your Railway deployment URL</p>
+        <input
+          type="url"
+          id="setting-backend-url"
+          class="settings-input"
+          placeholder="https://your-app.railway.app"
+          autocomplete="off"
+          spellcheck="false"
+        />
+      </div>
+
+      <!-- System prompt -->
+      <div class="settings-group">
+        <label class="settings-label" for="setting-system-prompt">Custom instructions</label>
+        <p class="settings-desc muted">How ALTAS should behave and respond</p>
+        <textarea
+          id="setting-system-prompt"
+          class="settings-textarea"
+          rows="6"
+          placeholder="You are ALTAS, a personal AI assistant…"
+          spellcheck="true"
+        ></textarea>
+      </div>
+
+      <!-- Temperature -->
+      <div class="settings-group">
+        <label class="settings-label" for="setting-temperature">
+          Temperature
+          <span class="settings-value-badge" id="temp-value">0.7</span>
+        </label>
+        <p class="settings-desc muted">Higher = more creative, lower = more precise</p>
+        <input
+          type="range"
+          id="setting-temperature"
+          class="settings-range"
+          min="0" max="1" step="0.05" value="0.7"
+          aria-valuemin="0" aria-valuemax="1" aria-valuenow="0.7"
+        />
+        <div class="settings-range-labels" aria-hidden="true">
+          <span>Precise</span>
+          <span>Balanced</span>
+          <span>Creative</span>
+        </div>
+      </div>
+
+      <!-- Max tokens -->
+      <div class="settings-group">
+        <label class="settings-label" for="setting-max-tokens">
+          Max tokens
+          <span class="settings-value-badge" id="tokens-value">1024</span>
+        </label>
+        <p class="settings-desc muted">Maximum length of each response</p>
+        <input
+          type="range"
+          id="setting-max-tokens"
+          class="settings-range"
+          min="256" max="4096" step="256" value="1024"
+        />
+      </div>
+
+      <!-- Save button -->
+      <button class="settings-save-btn" id="settings-save">
+        Save settings
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     SCRIPTS — dependency order
+     ui.js → api.js → chat.js → app.js
+     ═══════════════════════════════════════════════════════════ -->
+<script src="js/ui.js"></script>
+<script src="js/api.js"></script>
+<script src="js/chat.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,1115 @@
+/* ═══════════════════════════════════════════════════════════════
+   ALTAS — ANIMATIONS
+   Keyframes · Boot sequence · Micro-interactions · Motion system
+   All easing: cubic-bezier(0.16, 1, 0.3, 1) — expo-out physics
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────────────────────
+   1. CORE KEYFRAMES
+   ───────────────────────────────────────────────────────────── */
+
+/* Message enter — slides up + fades in */
+@keyframes msg-enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Generic fade up — used for welcome, chips, pills */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Fade in only */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Fade out only */
+@keyframes fade-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+/* Scale in — used for modals, toasts, overlays */
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Scale out */
+@keyframes scale-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+}
+
+/* Slide in from right — settings drawer */
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Slide in from left — sidebar on mobile */
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Slide in from bottom — mobile input, toasts */
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Overlay/modal enter */
+@keyframes overlay-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   2. BOOT SEQUENCE KEYFRAMES
+   ───────────────────────────────────────────────────────────── */
+
+/* Boot logo pulse */
+@keyframes boot-pulse {
+  0%, 100% {
+    opacity: 0.55;
+    transform: scale(0.96);
+    filter: drop-shadow(0 0 0px rgba(123,108,255,0));
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+    filter: drop-shadow(0 0 18px rgba(123,108,255,0.45));
+  }
+}
+
+/* Boot bar fill animation */
+@keyframes boot-bar-shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0;  }
+}
+
+/* App reveal after boot */
+@keyframes app-reveal {
+  from {
+    opacity: 0;
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+/* Sidebar stagger-in on boot */
+@keyframes sidebar-boot {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Header drop-in on boot */
+@keyframes header-boot {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Input zone rise on boot */
+@keyframes input-boot {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Welcome orb expand */
+@keyframes orb-reveal {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Welcome text stagger */
+@keyframes welcome-text-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+    letter-spacing: 0.04em;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    letter-spacing: inherit;
+  }
+}
+
+/* Chip stagger-in */
+@keyframes chip-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   3. CURSOR SYSTEM KEYFRAMES
+   ───────────────────────────────────────────────────────────── */
+
+/* Ring spin — used for loading state */
+@keyframes cursor-ring-spin {
+  from { transform: translate(-50%, -50%) rotate(0deg);   }
+  to   { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Dot entrance */
+@keyframes cursor-dot-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Ring entrance */
+@keyframes cursor-ring-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Link hover glow pulse */
+@keyframes cursor-link-glow {
+  0%, 100% {
+    box-shadow:
+      0 0 10px 3px rgba(123,108,255,0.35),
+      0 0 22px 6px rgba(123,108,255,0.15);
+  }
+  50% {
+    box-shadow:
+      0 0 14px 5px rgba(123,108,255,0.55),
+      0 0 30px 10px rgba(123,108,255,0.25);
+  }
+}
+
+/* Blocked ring shake */
+@keyframes cursor-blocked-shake {
+  0%,100% { transform: translate(-50%, -50%) rotate(0deg);  }
+  20%      { transform: translate(-50%, -50%) rotate(-8deg); }
+  40%      { transform: translate(-50%, -50%) rotate(8deg);  }
+  60%      { transform: translate(-50%, -50%) rotate(-5deg); }
+  80%      { transform: translate(-50%, -50%) rotate(5deg);  }
+}
+
+/* AI thinking ring breathe */
+@keyframes cursor-think-breathe {
+  0%, 100% {
+    width: 32px;
+    height: 32px;
+    opacity: 0.6;
+  }
+  50% {
+    width: 40px;
+    height: 40px;
+    opacity: 1;
+  }
+}
+
+/* Avatar ping on streaming */
+@keyframes avatar-ping {
+  0%   { box-shadow: 0 0 0 0 rgba(123,108,255,0.5); }
+  70%  { box-shadow: 0 0 0 8px rgba(123,108,255,0);  }
+  100% { box-shadow: 0 0 0 0 rgba(123,108,255,0);   }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   4. CHAT & MESSAGE KEYFRAMES
+   ───────────────────────────────────────────────────────────── */
+
+/* Streaming cursor blink */
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1;   }
+  50%       { opacity: 0.1; }
+}
+
+/* Streaming cursor fade out when done */
+@keyframes cursor-fade-out {
+  from { opacity: 1; width: 2px; }
+  to   { opacity: 0; width: 0px; }
+}
+
+/* Typing indicator bounce */
+@keyframes typing-bounce {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.3;
+  }
+  30% {
+    transform: translateY(-5px);
+    opacity: 1;
+  }
+}
+
+/* Stream progress shimmer */
+@keyframes stream-fill {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(300%);  }
+}
+
+/* Code block appear */
+@keyframes code-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   5. UI ELEMENT KEYFRAMES
+   ───────────────────────────────────────────────────────────── */
+
+/* Status dot pulse */
+@keyframes pulse-status {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(78,204,163,0.5);
+    opacity: 1;
+  }
+  50% {
+    box-shadow: 0 0 0 5px rgba(78,204,163,0);
+    opacity: 0.8;
+  }
+}
+
+/* Logo mark orbit spin */
+@keyframes orb-spin {
+  from { transform: rotate(0deg);   }
+  to   { transform: rotate(360deg); }
+}
+
+/* Welcome orb outer ring spin */
+@keyframes orbit-spin-outer {
+  from { transform: rotate(0deg);   }
+  to   { transform: rotate(360deg); }
+}
+
+/* Welcome orb inner ring counter-spin */
+@keyframes orbit-spin-inner {
+  from { transform: rotate(0deg);    }
+  to   { transform: rotate(-360deg); }
+}
+
+/* Grain drift — subtle randomness on grain texture */
+@keyframes grain-drift {
+  0%,100% { transform: translate(0, 0);      }
+  10%      { transform: translate(-2%, -3%);  }
+  20%      { transform: translate(-4%,  2%);  }
+  30%      { transform: translate( 2%, -4%);  }
+  40%      { transform: translate(-3%,  3%);  }
+  50%      { transform: translate( 3%, -1%);  }
+  60%      { transform: translate(-1%, -3%);  }
+  70%      { transform: translate( 4%,  2%);  }
+  80%      { transform: translate(-2%,  4%);  }
+  90%      { transform: translate( 1%, -2%);  }
+}
+
+/* Toast enter */
+@keyframes toast-enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Toast exit */
+@keyframes toast-exit {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(6px) scale(0.96);
+  }
+}
+
+/* Send button glow pulse when active */
+@keyframes send-glow {
+  0%, 100% {
+    box-shadow:
+      0 0 16px rgba(123,108,255,0.25),
+      0 4px 12px rgba(0,0,0,0.4);
+  }
+  50% {
+    box-shadow:
+      0 0 28px rgba(123,108,255,0.45),
+      0 6px 16px rgba(0,0,0,0.4);
+  }
+}
+
+/* Scroll-to-bottom FAB bounce in */
+@keyframes fab-bounce-in {
+  0%   { transform: translateY(8px) scale(0.85); opacity: 0; }
+  60%  { transform: translateY(-3px) scale(1.05); }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+/* Context meter fill */
+@keyframes meter-fill {
+  from { width: 0%; }
+}
+
+/* New conversation flash */
+@keyframes new-conv-flash {
+  0%   { background: rgba(123,108,255,0.15); }
+  100% { background: transparent; }
+}
+
+/* Spin generic */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   6. APPLIED ANIMATION CLASSES
+   Boot sequence — applied by app.js as .booted class toggled
+   ───────────────────────────────────────────────────────────── */
+
+/* Sidebar animates in after boot */
+#app.booted #sidebar {
+  animation: sidebar-boot 0.7s cubic-bezier(0.16,1,0.3,1) 0.05s both;
+}
+
+/* Header drops in */
+#app.booted #header {
+  animation: header-boot 0.6s cubic-bezier(0.16,1,0.3,1) 0.12s both;
+}
+
+/* Input zone rises */
+#app.booted #input-zone {
+  animation: input-boot 0.6s cubic-bezier(0.16,1,0.3,1) 0.18s both;
+}
+
+/* Welcome orb expands */
+#app.booted .welcome-orb-wrap {
+  animation: orb-reveal 0.8s cubic-bezier(0.16,1,0.3,1) 0.25s both;
+}
+
+/* Welcome title stagger */
+#app.booted .welcome-title {
+  animation: welcome-text-in 0.7s cubic-bezier(0.16,1,0.3,1) 0.35s both;
+}
+
+#app.booted .welcome-subtitle {
+  animation: welcome-text-in 0.7s cubic-bezier(0.16,1,0.3,1) 0.42s both;
+}
+
+#app.booted .welcome-body {
+  animation: welcome-text-in 0.6s cubic-bezier(0.16,1,0.3,1) 0.48s both;
+}
+
+#app.booted .welcome-pills {
+  animation: fade-up 0.6s cubic-bezier(0.16,1,0.3,1) 0.54s both;
+}
+
+/* Chips stagger — JS adds --i CSS var per chip */
+#app.booted .chip {
+  animation: chip-in 0.5s cubic-bezier(0.16,1,0.3,1) both;
+  animation-delay: calc(0.58s + var(--chip-i, 0) * 0.07s);
+}
+
+#app.booted .welcome-shortcut-hint {
+  animation: fade-up 0.5s cubic-bezier(0.16,1,0.3,1) 1.0s both;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   7. WELCOME SCREEN — ORB ANIMATIONS
+   ───────────────────────────────────────────────────────────── */
+
+.welcome-orb-wrap {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Outer orbit ring */
+.welcome-orb-orbit {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 0.5px solid transparent;
+}
+
+.welcome-orb-orbit--outer {
+  border-color: rgba(123,108,255,0.18);
+  animation: orbit-spin-outer 12s linear infinite;
+}
+
+.welcome-orb-orbit--mid {
+  inset: 12px;
+  border-color: rgba(123,108,255,0.28);
+  animation: orbit-spin-inner 8s linear infinite;
+}
+
+/* Orbit dot (the moving dot on the ring) */
+.welcome-orb-orbit-dot {
+  position: absolute;
+  top: -3px;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  transform: translateX(-50%);
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent), 0 0 16px rgba(123,108,255,0.4);
+}
+
+.welcome-orb-orbit--mid .welcome-orb-orbit-dot {
+  width: 4px;
+  height: 4px;
+  background: var(--accent-bright);
+  box-shadow: 0 0 6px var(--accent-bright);
+}
+
+/* Core circle */
+.welcome-orb-core {
+  position: relative;
+  z-index: 2;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%,
+    rgba(123,108,255,0.18),
+    rgba(123,108,255,0.06)
+  );
+  border: 0.5px solid rgba(123,108,255,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 0 30px rgba(123,108,255,0.12),
+    inset 0 0 20px rgba(123,108,255,0.05);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   8. WELCOME TEXT BLOCK
+   ───────────────────────────────────────────────────────────── */
+
+.welcome-text-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+}
+
+.welcome-eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+}
+
+.welcome-title {
+  font-size: clamp(26px, 3.5vw, 38px);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+  color: var(--text-100);
+}
+
+.welcome-title em {
+  font-style: normal;
+  background: linear-gradient(135deg, #9B8FFF 0%, #6AAFF0 60%, #4ECCA3 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.welcome-subtitle {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-400);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.welcome-body {
+  font-size: 15px;
+  line-height: 1.75;
+  max-width: 400px;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   9. WELCOME PILLS
+   ───────────────────────────────────────────────────────────── */
+
+.welcome-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  justify-content: center;
+  max-width: 480px;
+}
+
+.welcome-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background: var(--glass-1);
+  border: 0.5px solid var(--glass-border);
+  border-radius: var(--r-full);
+  font-size: 12px;
+  color: var(--text-400);
+  pointer-events: none;
+}
+
+.welcome-pill-icon {
+  display: flex;
+  align-items: center;
+  color: var(--accent);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   10. WELCOME CHIPS LABEL + SHORTCUT HINT
+   ───────────────────────────────────────────────────────────── */
+
+.welcome-chips-label {
+  margin-top: var(--sp-2);
+  margin-bottom: -var(--sp-1);
+}
+
+.welcome-shortcut-hint {
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  margin-top: var(--sp-3);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   11. SIDEBAR CAPABILITIES GRID
+   ───────────────────────────────────────────────────────────── */
+
+.sidebar-capabilities {
+  padding: 0 var(--sp-3) var(--sp-3);
+}
+
+.capability-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  margin-top: var(--sp-2);
+}
+
+.capability-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: var(--sp-3) var(--sp-2);
+  background: var(--glass-1);
+  border: 0.5px solid var(--glass-border);
+  border-radius: var(--r-md);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-400);
+  cursor: not-allowed;
+  opacity: 0.6;
+  transition:
+    background var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out);
+  text-align: center;
+}
+
+.capability-item:not([disabled]) {
+  cursor: pointer;
+  opacity: 1;
+}
+
+.capability-item:not([disabled]):hover {
+  background: var(--glass-2);
+  border-color: var(--glass-border-hover);
+  color: var(--text-200);
+}
+
+.capability-icon {
+  color: var(--text-500);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.capability-label {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+}
+
+.capability-badge {
+  font-size: 8px;
+  padding: 2px 5px;
+  background: var(--glass-2);
+  border: 0.5px solid var(--glass-border);
+  border-radius: var(--r-full);
+  color: var(--text-500);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   12. HEADER ENHANCEMENTS
+   ───────────────────────────────────────────────────────────── */
+
+.header-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.header-breadcrumb-root {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+}
+
+.header-breadcrumb-sep {
+  color: var(--text-500);
+  display: flex;
+  align-items: center;
+}
+
+.header-title-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-200);
+  max-width: 260px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.header-center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+}
+
+.context-meter {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.context-meter-bar {
+  width: 80px;
+  height: 2px;
+  background: var(--glass-border);
+  border-radius: var(--r-full);
+  overflow: hidden;
+}
+
+.context-meter-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-dim), var(--accent));
+  border-radius: var(--r-full);
+  transition: width 0.6s var(--ease-out);
+  animation: meter-fill 0.6s var(--ease-out) both;
+}
+
+.context-meter-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-500);
+  white-space: nowrap;
+}
+
+.header-toggle-group {
+  display: flex;
+  align-items: center;
+  background: var(--glass-1);
+  border: 0.5px solid var(--glass-border);
+  border-radius: var(--r-md);
+  padding: 3px;
+  gap: 2px;
+}
+
+.header-mode-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--text-400);
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  transition:
+    background var(--dur-base) var(--ease-out),
+    color var(--dur-base) var(--ease-out);
+  white-space: nowrap;
+}
+
+.header-mode-btn.active,
+.header-mode-btn[aria-pressed="true"] {
+  background: var(--glass-3);
+  color: var(--text-100);
+  border: 0.5px solid var(--glass-border);
+}
+
+.header-mode-btn svg {
+  width: 11px;
+  height: 11px;
+  flex-shrink: 0;
+}
+
+.header-divider {
+  width: 0.5px;
+  height: 20px;
+  background: var(--glass-border);
+  margin: 0 var(--sp-1);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   13. SIDEBAR ENHANCEMENTS
+   ───────────────────────────────────────────────────────────── */
+
+.sidebar-new-chat-wrap {
+  padding: 0 var(--sp-4) var(--sp-3);
+}
+
+.sidebar-search-wrap {
+  padding: 0 var(--sp-4) var(--sp-3);
+}
+
+.sidebar-search {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  background: var(--glass-1);
+  border: 0.5px solid var(--glass-border);
+  border-radius: var(--r-md);
+  transition:
+    border-color var(--dur-base) var(--ease-out),
+    background var(--dur-base) var(--ease-out);
+}
+
+.sidebar-search:focus-within {
+  border-color: rgba(123,108,255,0.3);
+  background: var(--glass-2);
+}
+
+.sidebar-search-icon {
+  color: var(--text-500);
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  transition: color var(--dur-base) var(--ease-out);
+}
+
+.sidebar-search:focus-within .sidebar-search-icon {
+  color: var(--accent);
+}
+
+.sidebar-search-input {
+  flex: 1;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-200);
+  background: transparent;
+  border: none;
+  outline: none;
+  min-width: 0;
+}
+
+.sidebar-search-input::placeholder {
+  color: var(--text-500);
+}
+
+.conv-group {
+  margin-bottom: var(--sp-2);
+}
+
+.conv-empty {
+  padding: var(--sp-3) var(--sp-4);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-500);
+  text-align: center;
+}
+
+.sidebar-spacer {
+  flex: 1;
+}
+
+.sidebar-collapse-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--r-sm);
+  background: transparent;
+  border: 0.5px solid transparent;
+  color: var(--text-500);
+  cursor: pointer;
+  margin-left: auto;
+  transition:
+    background var(--dur-base) var(--ease-out),
+    color var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out);
+}
+
+.sidebar-collapse-btn:hover {
+  background: var(--glass-2);
+  border-color: var(--glass-border);
+  color: var(--text-300);
+}
+
+.sidebar-footer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--sp-3);
+}
+
+.model-badge-tier {
+  color: var(--text-500);
+  font-size: 9px;
+}
+
+.sidebar-version {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-top: var(--sp-2);
+}
+
+.sidebar-version-sep {
+  color: var(--text-500);
+  font-size: 10px;
+}
+
+.logo-tagline {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-400);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.logo-tagline-sep {
+  color: var(--text-500);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   14. INPUT ZONE ENHANCEMENTS
+   ───────────────────────────────────────────────────────────── */
+
+.input-left-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  flex-shrink: 0;
+}
+
+.input-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--r-sm);
+  background: transparent;
+  border: 0.5px solid transparent;
+  color: var(--text-400);
+  cursor: not-allowed;
+  opacity: 0.5;
+  transition:
+    background var(--dur-base) var(--ease-out),
+    color var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out);
+}
+
+.input-action-btn:not([disabled]) {
+  cursor: pointer;
+  opacity: 1;
+}
+
+.input-action-btn:not([disabled]):hover {
+  background: var(--glass-2);
+  border-color: var(--glass-border);
+  color: var(--text-200);
+}
+
+.btn-send-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.input-meta-right {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.input-meta-sep {
+  color: var(--text-500);
+  font-size: 11px;
+}
+
+.input-mode-indicator {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+}
+
+.input-disclaimer {
+  text-align: center;
+  font-size: 10px;
+  margin-top: var(--sp-2);
+  letter-spacing: 0.04em;
+}
+
+.attachment-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  padding: var(--sp-2) 0 var(--sp-3);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   15. SEND BUTTON ACTIVE GLOW ANIMATION
+   ───────────────────────────────────────────────────────────── */
+
+.btn-send.active {
+  animation: send-glow 2s ease-in-out infinite;
+}
+
+/* Stop animation on hover — static glow on focus */
+.btn-send.active:hover {
+  animation: none;
+  box-shadow:
+    0 0 30px var(--accent-glow-strong),
+    0 6px 16px rgba(0,0,0,0.4);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   16. REDUCED MOTION
+   Honor system preference — strip all animations
+   ───────────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .grain::after { animation: none; }
+  .welcome-orb-orbit { animation: none; }
+  .stream-cursor { animation: none; opacity: 1; }
+  .typing-dot { animation: none; opacity: 0.6; }
+  .status-dot { animation: none; }
+}

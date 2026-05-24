@@ -3,18 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="description" content="ATLAS — Adaptive Tactical Logical Autonomous Sentinel. Your personal AI second brain." />
+  <meta name="description" content="ALTAS — Adaptive Logical Tactical Autonomous Sentinel. Your personal AI second brain." />
   <meta name="theme-color" content="#030306" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="ALTAS" />
 
   <!-- Open Graph -->
-  <meta property="og:title" content="ATLAS — Personal AI" />
+  <meta property="og:title" content="ALTAS — Personal AI" />
   <meta property="og:description" content="Your adaptive intelligence system." />
   <meta property="og:type" content="website" />
 
-  <title>ATLAS — Personal AI</title>
+  <title>ALTAS — Personal AI</title>
 
   <!-- Preconnect for fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -26,6 +26,7 @@
   <link rel="stylesheet" href="css/components.css" />
   <link rel="stylesheet" href="css/chat.css" />
   <link rel="stylesheet" href="css/animations.css" />
+  <link rel="stylesheet" href="css/cursor.css" />
 
   <!-- Inline critical: prevent flash -->
   <style>
@@ -935,6 +936,29 @@
       </button>
     </div>
   </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     ALTAS CUSTOM CURSOR SYSTEM
+     ═══════════════════════════════════════════════════════════ -->
+<div
+  id="altas-cursor"
+  class="state-default hidden"
+  aria-hidden="true"
+  role="presentation"
+>
+  <div id="altas-cursor-dot"></div>
+  <div id="altas-cursor-ring">
+    <div id="altas-cursor-label" aria-hidden="true"></div>
+  </div>
+  <div id="altas-cursor-ibeam" aria-hidden="true">
+    <div class="cursor-ibeam-top"></div>
+    <div class="cursor-ibeam-stem"></div>
+    <div class="cursor-ibeam-bottom"></div>
+  </div>
+  <div id="altas-cursor-zoom" aria-hidden="true">+</div>
+  <div id="altas-cursor-thinking" aria-hidden="true"></div>
 </div>
 
 

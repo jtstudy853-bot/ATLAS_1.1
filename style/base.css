@@ -48,6 +48,7 @@
   /* Typography */
   --font-display:  'Syne', sans-serif;
   --font-mono:     'DM Mono', monospace;
+  --font-title:    'Blanka', 'Syne', sans-serif; /* Structural UI only — never AI content */
 
   /* Spacing scale */
   --sp-1:  4px;
@@ -249,4 +250,65 @@ img, svg { display: block; }
   outline: 1.5px solid var(--accent);
   outline-offset: 3px;
   border-radius: var(--r-sm);
+}
+
+/* ─── Blanka font — structural UI only ─────────────────────── */
+/*
+  Applied to: logo name, section labels, header title, sidebar
+  section headers, overlay titles, settings title, welcome title,
+  capability labels, boot label.
+
+  NOT applied to: AI message content, user input, markdown output,
+  code blocks, tooltips, or any dynamically generated text.
+*/
+
+.logo-name,
+.sidebar-section-label,
+.sidebar-section-label *,
+.header-title-text,
+.overlay-title,
+.settings-title,
+.welcome-title,
+.boot-label,
+.capability-label,
+.conv-group .sidebar-section-label {
+  font-family: var(--font-title) !important;
+  letter-spacing: 0.06em;
+}
+
+/* Logo name — bigger tracking for the ALTAS wordmark */
+.logo-name {
+  letter-spacing: 0.18em;
+}
+
+/* Section labels — all caps already, Blanka amplifies it */
+.sidebar-section-label {
+  letter-spacing: 0.14em;
+  font-size: 10px;
+}
+
+/* Welcome title — gradient text + Blanka */
+.welcome-title {
+  letter-spacing: -0.01em; /* Tighten slightly at large size */
+}
+
+/* Header breadcrumb title */
+.header-title-text {
+  letter-spacing: 0.08em;
+}
+
+/* Overlay / modal titles */
+.overlay-title,
+.settings-title {
+  letter-spacing: 0.1em;
+}
+
+/* Boot screen loading label */
+.boot-label {
+  letter-spacing: 0.16em;
+}
+
+/* Capability grid labels */
+.capability-label {
+  letter-spacing: 0.1em;
 }

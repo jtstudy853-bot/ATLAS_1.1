@@ -1,0 +1,485 @@
+/* ═══════════════════════════════════════════════════════════════
+   ALTAS — SLASH.CSS
+   Slash command trigger · Input highlight · Dropdown polish
+   Active command chip · Mobile adaptations · Micro-interactions
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────────────────────
+   1. INPUT SHELL — slash mode state
+   When "/" is typed, the shell gets a violet tint to signal
+   command mode is active
+   ───────────────────────────────────────────────────────────── */
+
+.input-shell.slash-mode {
+  border-color: rgba(123,108,255,0.45);
+  background: rgba(14,14,30,0.95);
+  box-shadow:
+    0 0 0 1px rgba(123,108,255,0.15),
+    0 0 24px rgba(123,108,255,0.07),
+    inset 0 0 16px rgba(123,108,255,0.04);
+}
+
+/* Slash mode scanning line — stronger than focus default */
+.input-shell.slash-mode::before {
+  opacity: 1;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--accent-bright) 50%,
+    transparent 100%
+  );
+  animation: slash-scan 1.8s ease-in-out infinite;
+}
+
+@keyframes slash-scan {
+  0%   { background-position: -100% 0; opacity: 0.4; }
+  50%  { background-position: 100%  0; opacity: 0.9; }
+  100% { background-position: 300%  0; opacity: 0.4; }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   2. SLASH TRIGGER CHARACTER HIGHLIGHT
+   The "/" character in the textarea gets a coloured highlight
+   via an absolutely-positioned overlay element (#slash-highlight)
+   ───────────────────────────────────────────────────────────── */
+
+#slash-highlight {
+  position: absolute;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+  z-index: 1;
+  font-family: var(--font-display);
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--accent-bright);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  white-space: pre;
+  padding: 0; /* must match textarea padding exactly */
+}
+
+#slash-highlight.visible {
+  opacity: 1;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   3. DROPDOWN POSITIONING CONTEXT
+   #input-zone-inner needs position:relative so the dropdown
+   can absolute-position above the input shell
+   ───────────────────────────────────────────────────────────── */
+
+.input-zone-inner {
+  position: relative;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   4. DROPDOWN — enhanced from tool-cards.css base
+   Supplementary rules for states and edge cases
+   ───────────────────────────────────────────────────────────── */
+
+/* Scrollable command list — custom scrollbar */
+.slash-command-list::-webkit-scrollbar {
+  width: 3px;
+}
+
+.slash-command-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.slash-command-list::-webkit-scrollbar-thumb {
+  background: var(--glass-border);
+  border-radius: var(--r-full);
+}
+
+/* ── Command item — richer hover state ── */
+.slash-command-item {
+  outline: none;
+}
+
+.slash-command-item.focused {
+  background: rgba(123,108,255,0.07);
+}
+
+/* Filter query highlight inside command name */
+.slash-command-name mark {
+  background: rgba(123,108,255,0.2);
+  color: var(--accent-bright);
+  border-radius: 3px;
+  padding: 0 3px;
+  font-style: normal;
+}
+
+/* ── Section dividers between command groups ── */
+.slash-command-section {
+  padding: var(--sp-2) var(--sp-4) var(--sp-1);
+  font-family: var(--font-title);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  color: var(--text-500);
+  text-transform: uppercase;
+  border-top: 0.5px solid var(--glass-border);
+  margin-top: var(--sp-1);
+}
+
+.slash-command-section:first-child {
+  border-top: none;
+  margin-top: 0;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   5. ACTIVE COMMAND CHIP
+   Once a command is selected, it appears as a violet chip
+   at the start of the input — showing which command is active
+   ───────────────────────────────────────────────────────────── */
+
+.slash-active-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px 3px 6px;
+  background: var(--accent-glow);
+  border: 0.5px solid rgba(123,108,255,0.35);
+  border-radius: var(--r-full);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent-bright);
+  flex-shrink: 0;
+  white-space: nowrap;
+  animation: chip-pop 0.25s cubic-bezier(0.16,1,0.3,1) forwards;
+  cursor: default;
+  user-select: none;
+}
+
+.slash-active-chip-icon {
+  display: flex;
+  align-items: center;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.slash-active-chip-icon svg {
+  width: 11px;
+  height: 11px;
+}
+
+.slash-active-chip-name {
+  letter-spacing: 0.04em;
+}
+
+/* Dismiss X on the chip */
+.slash-active-chip-dismiss {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: rgba(123,108,255,0.2);
+  cursor: pointer;
+  transition: background 0.15s ease;
+  flex-shrink: 0;
+  margin-left: 2px;
+}
+
+.slash-active-chip-dismiss:hover {
+  background: rgba(232,89,60,0.25);
+  color: var(--danger);
+}
+
+.slash-active-chip-dismiss svg {
+  width: 8px;
+  height: 8px;
+}
+
+/* Input shell: chip + textarea layout */
+.input-shell.has-command-chip {
+  padding-left: var(--sp-3);
+  gap: var(--sp-2);
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+/* Chip pop in */
+@keyframes chip-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateX(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateX(0);
+  }
+}
+
+/* Chip dismiss */
+@keyframes chip-dismiss {
+  from {
+    opacity: 1;
+    transform: scale(1);
+    max-width: 200px;
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.8);
+    max-width: 0;
+    padding: 0;
+    margin: 0;
+  }
+}
+
+.slash-active-chip.dismissing {
+  animation: chip-dismiss 0.18s cubic-bezier(0.7,0,0.84,0) forwards;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   6. COMMAND ARGUMENT PLACEHOLDER
+   After selecting a command, greyed placeholder text shows
+   the expected argument format inside the textarea
+   ───────────────────────────────────────────────────────────── */
+
+#prompt-input.has-slash-command::placeholder {
+  color: rgba(123,108,255,0.45);
+  font-style: italic;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   7. PER-COMMAND ICON COLOURS
+   Each command icon gets its own tint when focused
+   ───────────────────────────────────────────────────────────── */
+
+/* add event / calendar */
+.slash-command-item[data-cmd="add-event"].focused .slash-command-icon,
+.slash-command-item[data-cmd="add-event"]:hover   .slash-command-icon {
+  background: rgba(155,143,255,0.15);
+  border-color: rgba(155,143,255,0.3);
+  color: var(--accent-bright);
+}
+
+/* add file */
+.slash-command-item[data-cmd="add-file"].focused .slash-command-icon,
+.slash-command-item[data-cmd="add-file"]:hover   .slash-command-icon {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.15);
+  color: var(--text-100);
+}
+
+/* search */
+.slash-command-item[data-cmd="search"].focused .slash-command-icon,
+.slash-command-item[data-cmd="search"]:hover   .slash-command-icon {
+  background: rgba(242,166,35,0.12);
+  border-color: rgba(242,166,35,0.25);
+  color: var(--warning);
+}
+
+/* run */
+.slash-command-item[data-cmd="run"].focused .slash-command-icon,
+.slash-command-item[data-cmd="run"]:hover   .slash-command-icon {
+  background: rgba(74,158,255,0.12);
+  border-color: rgba(74,158,255,0.25);
+  color: var(--info);
+}
+
+/* remember */
+.slash-command-item[data-cmd="remember"].focused .slash-command-icon,
+.slash-command-item[data-cmd="remember"]:hover   .slash-command-icon {
+  background: rgba(78,204,163,0.12);
+  border-color: rgba(78,204,163,0.25);
+  color: var(--success);
+}
+
+/* recall */
+.slash-command-item[data-cmd="recall"].focused .slash-command-icon,
+.slash-command-item[data-cmd="recall"]:hover   .slash-command-icon {
+  background: rgba(78,204,163,0.1);
+  border-color: rgba(78,204,163,0.2);
+  color: var(--success);
+}
+
+/* summarize */
+.slash-command-item[data-cmd="summarize"].focused .slash-command-icon,
+.slash-command-item[data-cmd="summarize"]:hover   .slash-command-icon {
+  background: rgba(74,158,255,0.1);
+  border-color: rgba(74,158,255,0.2);
+  color: var(--info);
+}
+
+/* notify */
+.slash-command-item[data-cmd="notify"].focused .slash-command-icon,
+.slash-command-item[data-cmd="notify"]:hover   .slash-command-icon {
+  background: rgba(232,89,60,0.1);
+  border-color: rgba(232,89,60,0.2);
+  color: var(--danger);
+}
+
+/* github */
+.slash-command-item[data-cmd="github"].focused .slash-command-icon,
+.slash-command-item[data-cmd="github"]:hover   .slash-command-icon {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.15);
+  color: var(--text-100);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   8. COMMAND ARGUMENT FORM
+   Some commands (add event) render a mini inline form
+   inside the dropdown for structured input
+   ───────────────────────────────────────────────────────────── */
+
+.slash-arg-form {
+  padding: var(--sp-3) var(--sp-4) var(--sp-4);
+  border-top: 0.5px solid var(--glass-border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  animation: fade-up 0.2s cubic-bezier(0.16,1,0.3,1) forwards;
+}
+
+.slash-arg-form-title {
+  font-family: var(--font-title);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--text-400);
+  text-transform: uppercase;
+}
+
+.slash-arg-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+
+.slash-arg-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-500);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.slash-arg-input {
+  padding: var(--sp-2) var(--sp-3);
+  background: rgba(0,0,0,0.3);
+  border: 0.5px solid var(--glass-border);
+  border-radius: var(--r-md);
+  font-family: var(--font-display);
+  font-size: 13px;
+  color: var(--text-100);
+  outline: none;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+  width: 100%;
+  caret-color: var(--accent-bright);
+}
+
+.slash-arg-input:focus {
+  border-color: rgba(123,108,255,0.4);
+  box-shadow: 0 0 0 1px rgba(123,108,255,0.1);
+}
+
+.slash-arg-input::placeholder {
+  color: var(--text-500);
+}
+
+.slash-arg-row-inline {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-2);
+}
+
+.slash-arg-submit {
+  padding: var(--sp-2) var(--sp-4);
+  background: var(--accent);
+  border: none;
+  border-radius: var(--r-md);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  color: #fff;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition:
+    background 0.15s ease,
+    transform 0.1s ease;
+  align-self: flex-end;
+}
+
+.slash-arg-submit:hover {
+  background: var(--accent-bright);
+  transform: translateY(-1px);
+}
+
+.slash-arg-submit:active {
+  transform: translateY(0);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   9. MOBILE ADAPTATIONS
+   On small screens the dropdown goes full-width and
+   anchors to the bottom of the screen
+   ───────────────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  #slash-dropdown {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    max-width: 100%;
+    border-radius: var(--r-xl) var(--r-xl) 0 0;
+    border-bottom: none;
+    transform: translateY(100%);
+    max-height: 75vh;
+    overflow-y: auto;
+  }
+
+  #slash-dropdown.visible {
+    transform: translateY(0);
+    box-shadow: 0 -20px 60px rgba(0,0,0,0.6);
+  }
+
+  .slash-command-item {
+    padding: var(--sp-4) var(--sp-5);
+  }
+
+  .slash-command-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .slash-dropdown-footer {
+    padding: var(--sp-3) var(--sp-5);
+    display: none; /* Hide key hints on mobile */
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   10. AUTOCOMPLETE GHOST TEXT
+   Shows expected argument format as greyed ghost text
+   inside the textarea — overlaid via a mirror div
+   ───────────────────────────────────────────────────────────── */
+
+#input-ghost {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  font-family: var(--font-display);
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-500);
+  white-space: pre-wrap;
+  word-break: break-word;
+  padding: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+/* The actual input sits above the ghost */
+#prompt-input {
+  position: relative;
+  z-index: 1;
+  background: transparent;
+}

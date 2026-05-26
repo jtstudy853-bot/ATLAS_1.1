@@ -30,6 +30,7 @@
   <link rel="stylesheet" href="style/chat.css" />
   <link rel="stylesheet" href="style/animations.css" />
   <link rel="stylesheet" href="style/cursor.css" />
+  <link rel="stylesheet" href="style/tool-cards.css" />
 
   <!-- Inline critical: prevent flash -->
   <style>
@@ -678,6 +679,35 @@
           hidden
         >
           <!-- Populated by ui.js when files attached -->
+        </div>
+
+        <!-- ── Slash command dropdown — floats above input shell ── -->
+        <div
+          id="slash-dropdown"
+          role="listbox"
+          aria-label="Available slash commands"
+          aria-hidden="true"
+        >
+          <div class="slash-dropdown-header">
+            <span class="slash-dropdown-title">Commands</span>
+            <span class="slash-dropdown-hint">↑↓ navigate · ↵ select · Esc close</span>
+          </div>
+
+          <div class="slash-command-list" id="slash-command-list" role="presentation">
+            <!-- Populated by slash.js -->
+          </div>
+
+          <div class="slash-dropdown-footer" aria-hidden="true">
+            <span class="slash-dropdown-key-hint">
+              <kbd class="kbd">↑</kbd><kbd class="kbd">↓</kbd> navigate
+            </span>
+            <span class="slash-dropdown-key-hint">
+              <kbd class="kbd">↵</kbd> select
+            </span>
+            <span class="slash-dropdown-key-hint">
+              <kbd class="kbd">Esc</kbd> close
+            </span>
+          </div>
         </div>
 
         <!-- Main input shell -->

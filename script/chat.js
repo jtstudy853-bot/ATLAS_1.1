@@ -220,6 +220,7 @@ const ALTASChat = (() => {
       card.className = 'tool-call-card tool-call-card--running';
       card.setAttribute('aria-label', `ALTAS using tool: ${label}`);
       card.dataset.toolId = id;
+      card.dataset.tool   = name;  /* Drives per-tool colour in tool-cards.css */
 
       card.innerHTML = `
         <div class="tool-call-icon" aria-hidden="true">${icon}</div>
@@ -957,78 +958,9 @@ const ALTASChat = (() => {
 })();
 
 /* ─────────────────────────────────────────────────────────────
-   TOOL CALL CARD CSS — injected here so chat.js is self-contained
-   for tool card styling (full panel CSS comes in add-on phase)
+   TOOL CARD STYLES — now in css/tool-cards.css
+   Stub removed: styles loaded via <link> in index.html
    ───────────────────────────────────────────────────────────── */
-
-(function injectToolCardStyles() {
-  const style = document.createElement('style');
-  style.id = 'altas-tool-card-styles';
-  style.textContent = `
-    .tool-call-card {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 14px;
-      margin: 6px 0 6px calc(28px + 12px);
-      background: rgba(123,108,255,0.05);
-      border: 0.5px solid rgba(123,108,255,0.18);
-      border-radius: 10px;
-      font-family: var(--font-mono);
-      font-size: 11px;
-      color: var(--text-400);
-      animation: msg-enter 0.35s cubic-bezier(0.16,1,0.3,1) forwards;
-      max-width: 480px;
-      transition: border-color 0.2s ease, background 0.2s ease;
-    }
-    .tool-call-card--done {
-      background: rgba(78,204,163,0.04);
-      border-color: rgba(78,204,163,0.15);
-    }
-    .tool-call-icon {
-      font-size: 14px;
-      color: var(--accent);
-      flex-shrink: 0;
-      width: 20px;
-      text-align: center;
-    }
-    .tool-call-body {
-      flex: 1;
-      min-width: 0;
-    }
-    .tool-call-label {
-      color: var(--text-300);
-      font-weight: 500;
-      letter-spacing: 0.04em;
-      margin-bottom: 2px;
-    }
-    .tool-call-detail {
-      color: var(--text-500);
-      font-size: 10px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .tool-call-status {
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 18px;
-      height: 18px;
-      color: var(--success);
-    }
-    .tool-call-spinner {
-      width: 14px;
-      height: 14px;
-      border: 1.5px solid rgba(123,108,255,0.2);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-  `;
-  document.head.appendChild(style);
-})();
 
 /* Auto-init when DOM ready */
 if (document.readyState === 'loading') {

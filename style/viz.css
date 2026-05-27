@@ -1,0 +1,703 @@
+/* ═══════════════════════════════════════════════════════════════
+   ALTAS — VIZ.CSS
+   Visualisation engine · Mindmap · Charts · Network graphs
+   Inline rendering · Toolbar · Export · Responsive canvas
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────────────────────
+   1. VIZ CONTAINER — inline inside chat bubble
+   ───────────────────────────────────────────────────────────── */
+
+.viz-container {
+  position: relative;
+  margin: var(--sp-4) 0;
+  border-radius: var(--r-lg);
+  border: 0.5px solid var(--glass-border);
+  background: rgba(5,5,12,0.7);
+  overflow: hidden;
+  transition: border-color var(--dur-base) var(--ease-out);
+}
+
+.viz-container:hover {
+  border-color: rgba(123,108,255,0.25);
+}
+
+/* Top shimmer on hover */
+.viz-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(123,108,255,0.5),
+    transparent
+  );
+  opacity: 0;
+  transition: opacity var(--dur-slow) var(--ease-out);
+}
+
+.viz-container:hover::before {
+  opacity: 1;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   2. VIZ TOOLBAR
+   Header bar with title, type badge, and action buttons
+   ───────────────────────────────────────────────────────────── */
+
+.viz-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-2) var(--sp-4);
+  background: rgba(255,255,255,0.025);
+  border-bottom: 0.5px solid var(--glass-border);
+}
+
+.viz-toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex: 1;
+  min-width: 0;
+}
+
+/* Traffic-light dots — matches code block aesthetic */
+.viz-dots {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.viz-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  opacity: 0.45;
+}
+
+.viz-dot:nth-child(1) { background: #FF5F57; }
+.viz-dot:nth-child(2) { background: #FFBD2E; }
+.viz-dot:nth-child(3) { background: #28CA41; }
+
+.viz-title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-300);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Type badge */
+.viz-type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: var(--r-full);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.viz-type-badge[data-type="mindmap"] {
+  background: rgba(123,108,255,0.1);
+  border: 0.5px solid rgba(123,108,255,0.25);
+  color: var(--accent-bright);
+}
+
+.viz-type-badge[data-type="bar"],
+.viz-type-badge[data-type="line"],
+.viz-type-badge[data-type="pie"] {
+  background: rgba(74,158,255,0.1);
+  border: 0.5px solid rgba(74,158,255,0.25);
+  color: var(--info);
+}
+
+.viz-type-badge[data-type="network"] {
+  background: rgba(78,204,163,0.1);
+  border: 0.5px solid rgba(78,204,163,0.25);
+  color: var(--success);
+}
+
+.viz-type-badge[data-type="timeline"] {
+  background: rgba(242,166,35,0.1);
+  border: 0.5px solid rgba(242,166,35,0.25);
+  color: var(--warning);
+}
+
+.viz-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  flex-shrink: 0;
+}
+
+.viz-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--r-sm);
+  background: transparent;
+  border: 0.5px solid transparent;
+  color: var(--text-400);
+  cursor: pointer;
+  transition:
+    background var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out),
+    color var(--dur-base) var(--ease-out);
+}
+
+.viz-action-btn:hover {
+  background: var(--glass-2);
+  border-color: var(--glass-border);
+  color: var(--text-100);
+}
+
+.viz-action-btn svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   3. VIZ CANVAS AREA
+   Where SVG / Canvas renders
+   ───────────────────────────────────────────────────────────── */
+
+.viz-canvas {
+  position: relative;
+  width: 100%;
+  min-height: 280px;
+  max-height: 520px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+}
+
+.viz-canvas:active {
+  cursor: grabbing;
+}
+
+.viz-canvas svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  user-select: none;
+}
+
+.viz-canvas canvas {
+  display: block;
+  max-width: 100%;
+}
+
+/* Zoom controls overlay */
+.viz-zoom-controls {
+  position: absolute;
+  bottom: var(--sp-3);
+  right: var(--sp-3);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 10;
+}
+
+.viz-zoom-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--r-sm);
+  background: rgba(10,10,20,0.85);
+  backdrop-filter: blur(8px);
+  border: 0.5px solid var(--glass-border);
+  color: var(--text-300);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  transition:
+    background var(--dur-base) ease,
+    color var(--dur-base) ease;
+}
+
+.viz-zoom-btn:hover {
+  background: rgba(20,20,40,0.95);
+  color: var(--text-100);
+}
+
+/* Loading state */
+.viz-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-8);
+  color: var(--text-400);
+}
+
+.viz-loading-spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--glass-border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.viz-loading-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-400);
+  letter-spacing: 0.06em;
+}
+
+/* Error state */
+.viz-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-6);
+  color: var(--danger);
+  text-align: center;
+}
+
+.viz-error svg {
+  width: 20px;
+  height: 20px;
+  opacity: 0.7;
+}
+
+.viz-error-text {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--danger);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   4. MINDMAP STYLES
+   SVG-based mindmap rendered by viz.js
+   ───────────────────────────────────────────────────────────── */
+
+/* Root node */
+.mm-root {
+  cursor: default;
+}
+
+.mm-root-circle {
+  fill: var(--accent);
+  filter: drop-shadow(0 0 8px rgba(123,108,255,0.4));
+  transition: r 0.2s var(--ease-out);
+}
+
+.mm-root-text {
+  fill: #fff;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+}
+
+/* Branch node */
+.mm-node {
+  cursor: pointer;
+}
+
+.mm-node-rect {
+  rx: 8;
+  fill: rgba(123,108,255,0.08);
+  stroke: rgba(123,108,255,0.3);
+  stroke-width: 0.5;
+  transition: fill 0.15s ease, stroke 0.15s ease;
+}
+
+.mm-node:hover .mm-node-rect {
+  fill: rgba(123,108,255,0.16);
+  stroke: rgba(123,108,255,0.55);
+}
+
+.mm-node.selected .mm-node-rect {
+  fill: rgba(123,108,255,0.2);
+  stroke: var(--accent);
+  stroke-width: 1;
+}
+
+.mm-node-text {
+  fill: rgba(255,255,255,0.85);
+  font-family: 'Syne', sans-serif;
+  font-size: 12px;
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+}
+
+/* Leaf node */
+.mm-leaf-rect {
+  rx: 6;
+  fill: rgba(255,255,255,0.04);
+  stroke: rgba(255,255,255,0.08);
+  stroke-width: 0.5;
+  transition: fill 0.15s ease, stroke 0.15s ease;
+}
+
+.mm-leaf:hover .mm-leaf-rect {
+  fill: rgba(255,255,255,0.07);
+  stroke: rgba(255,255,255,0.15);
+}
+
+.mm-leaf-text {
+  fill: rgba(255,255,255,0.65);
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+}
+
+/* Connector lines */
+.mm-link {
+  fill: none;
+  stroke: rgba(123,108,255,0.25);
+  stroke-width: 1;
+  transition: stroke 0.15s ease, stroke-width 0.15s ease;
+}
+
+.mm-link.highlighted {
+  stroke: rgba(123,108,255,0.6);
+  stroke-width: 1.5;
+}
+
+/* Depth-based colour variants */
+.mm-depth-1 .mm-node-rect { fill: rgba(123,108,255,0.1);  stroke: rgba(123,108,255,0.35); }
+.mm-depth-2 .mm-node-rect { fill: rgba(74,158,255,0.08);  stroke: rgba(74,158,255,0.25);  }
+.mm-depth-3 .mm-node-rect { fill: rgba(78,204,163,0.07);  stroke: rgba(78,204,163,0.22);  }
+.mm-depth-4 .mm-node-rect { fill: rgba(242,166,35,0.07);  stroke: rgba(242,166,35,0.22);  }
+
+.mm-depth-1 .mm-link { stroke: rgba(123,108,255,0.3); }
+.mm-depth-2 .mm-link { stroke: rgba(74,158,255,0.25); }
+.mm-depth-3 .mm-link { stroke: rgba(78,204,163,0.22); }
+
+/* Collapse toggle circle */
+.mm-toggle {
+  fill: rgba(10,10,20,0.9);
+  stroke: rgba(255,255,255,0.15);
+  stroke-width: 0.5;
+  cursor: pointer;
+  transition: fill 0.15s ease;
+}
+
+.mm-toggle:hover {
+  fill: rgba(30,30,60,0.95);
+  stroke: var(--accent);
+}
+
+.mm-toggle-icon {
+  fill: rgba(255,255,255,0.5);
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   5. CHART STYLES (bar / line / pie via canvas/SVG)
+   ───────────────────────────────────────────────────────────── */
+
+/* Chart legend */
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  border-top: 0.5px solid var(--glass-border);
+}
+
+.chart-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-300);
+}
+
+.chart-legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* Tooltip */
+.chart-tooltip {
+  position: absolute;
+  pointer-events: none;
+  background: rgba(10,10,22,0.95);
+  border: 0.5px solid var(--glass-border);
+  border-radius: var(--r-md);
+  padding: var(--sp-2) var(--sp-3);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-100);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  backdrop-filter: blur(12px);
+  white-space: nowrap;
+  z-index: 20;
+  opacity: 0;
+  transform: translateY(4px);
+  transition:
+    opacity var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+
+.chart-tooltip.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.chart-tooltip-label {
+  color: var(--text-400);
+  font-size: 10px;
+  margin-bottom: 2px;
+}
+
+.chart-tooltip-value {
+  color: var(--accent-bright);
+  font-weight: 500;
+}
+
+/* SVG axis styles (applied directly by viz.js) */
+.chart-axis-line {
+  stroke: rgba(255,255,255,0.08);
+  stroke-width: 0.5;
+}
+
+.chart-axis-tick {
+  fill: rgba(255,255,255,0.3);
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+}
+
+.chart-grid-line {
+  stroke: rgba(255,255,255,0.04);
+  stroke-width: 0.5;
+  stroke-dasharray: 3 3;
+}
+
+.chart-bar {
+  transition: opacity 0.15s ease;
+}
+
+.chart-bar:hover {
+  opacity: 0.85;
+}
+
+.chart-line-path {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.chart-area-path {
+  opacity: 0.15;
+}
+
+.chart-dot {
+  transition: r 0.15s ease;
+}
+
+.chart-dot:hover {
+  r: 5;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   6. NETWORK GRAPH STYLES
+   Node-link force-directed graph
+   ───────────────────────────────────────────────────────────── */
+
+.net-node {
+  cursor: pointer;
+}
+
+.net-node-circle {
+  stroke-width: 1;
+  transition: r 0.15s ease, opacity 0.15s ease;
+}
+
+.net-node:hover .net-node-circle {
+  opacity: 0.85;
+}
+
+.net-node.selected .net-node-circle {
+  stroke-width: 2;
+  filter: drop-shadow(0 0 6px currentColor);
+}
+
+.net-node-label {
+  fill: rgba(255,255,255,0.75);
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  text-anchor: middle;
+  dominant-baseline: text-before-edge;
+  pointer-events: none;
+}
+
+.net-link {
+  stroke: rgba(255,255,255,0.08);
+  stroke-width: 1;
+  fill: none;
+  transition: stroke 0.15s ease, stroke-width 0.15s ease;
+}
+
+.net-link.highlighted {
+  stroke: rgba(123,108,255,0.4);
+  stroke-width: 1.5;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   7. TIMELINE STYLES
+   Horizontal event timeline
+   ───────────────────────────────────────────────────────────── */
+
+.timeline-track {
+  stroke: rgba(255,255,255,0.08);
+  stroke-width: 1;
+}
+
+.timeline-event {
+  cursor: pointer;
+}
+
+.timeline-event-dot {
+  transition: r 0.15s ease;
+}
+
+.timeline-event:hover .timeline-event-dot {
+  r: 6;
+}
+
+.timeline-event-label {
+  fill: rgba(255,255,255,0.65);
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  text-anchor: middle;
+}
+
+.timeline-event-date {
+  fill: rgba(255,255,255,0.35);
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  text-anchor: middle;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   8. VIZ FOOTER
+   Stats bar below the canvas
+   ───────────────────────────────────────────────────────────── */
+
+.viz-footer {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  padding: var(--sp-2) var(--sp-4);
+  border-top: 0.5px solid var(--glass-border);
+  background: rgba(0,0,0,0.2);
+}
+
+.viz-footer-stat {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-500);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.viz-footer-stat strong {
+  color: var(--text-300);
+  font-weight: 500;
+}
+
+.viz-footer-hint {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-500);
+  margin-left: auto;
+  letter-spacing: 0.04em;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   9. VIZ ENTER ANIMATION
+   ───────────────────────────────────────────────────────────── */
+
+.viz-container {
+  animation: viz-enter 0.45s cubic-bezier(0.16,1,0.3,1) forwards;
+  opacity: 0;
+}
+
+@keyframes viz-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* SVG node entrance stagger */
+.mm-node,
+.mm-leaf,
+.net-node,
+.timeline-event {
+  animation: viz-node-in 0.35s cubic-bezier(0.16,1,0.3,1) both;
+}
+
+@keyframes viz-node-in {
+  from {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   10. RESPONSIVE
+   ───────────────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .viz-canvas {
+    min-height: 220px;
+    max-height: 380px;
+  }
+
+  .viz-toolbar {
+    padding: var(--sp-2) var(--sp-3);
+    gap: var(--sp-2);
+  }
+
+  .chart-legend {
+    padding: var(--sp-2) var(--sp-3);
+    gap: var(--sp-2);
+  }
+}

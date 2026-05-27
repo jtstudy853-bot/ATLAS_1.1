@@ -24,14 +24,15 @@
   <link rel="stylesheet" href="https://fonts.cdnfonts.com/css/blanka" />
 
   <!-- CSS load order matters -->
-  <link rel="stylesheet" href="style/base.css" />
-  <link rel="stylesheet" href="style/layout.css" />
-  <link rel="stylesheet" href="style/components.css" />
-  <link rel="stylesheet" href="style/chat.css" />
-  <link rel="stylesheet" href="style/animations.css" />
-  <link rel="stylesheet" href="style/cursor.css" />
-  <link rel="stylesheet" href="style/tool-cards.css" />
-  <link rel="stylesheet" href="style/slash.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/layout.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/chat.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+  <link rel="stylesheet" href="css/cursor.css" />
+  <link rel="stylesheet" href="css/tool-cards.css" />
+  <link rel="stylesheet" href="css/slash.css" />
+  <link rel="stylesheet" href="css/projects.css" />
 
   <!-- Inline critical: prevent flash -->
   <style>
@@ -188,56 +189,128 @@
       </button>
     </div>
 
-    <!-- ── Sidebar: Search conversations ── -->
-    <div class="sidebar-search-wrap">
-      <div class="sidebar-search" role="search">
-        <span class="sidebar-search-icon" aria-hidden="true">
+    <!-- ── Sidebar: Nav tabs — Chats / Projects / Memory ── -->
+    <div class="sidebar-nav-tabs" role="tablist" aria-label="Sidebar navigation">
+      <button class="sidebar-nav-tab active" data-tab="chats"
+        role="tab" aria-selected="true" aria-controls="panel-chats">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"
+          stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M1 2.5a1.5 1.5 0 011.5-1.5h7A1.5 1.5 0 0111 2.5v5A1.5 1.5 0 019.5 9H7l-3 2V9H2.5A1.5 1.5 0 011 7.5v-5z"/>
+        </svg>
+        Chats
+      </button>
+      <button class="sidebar-nav-tab" data-tab="projects"
+        role="tab" aria-selected="false" aria-controls="panel-projects">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"
+          stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="1" y="3" width="10" height="8" rx="1.5"/>
+          <path d="M1 6h10M4 3V1.5M8 3V1.5"/>
+        </svg>
+        Projects
+      </button>
+      <button class="sidebar-nav-tab" data-tab="memory"
+        role="tab" aria-selected="false" aria-controls="panel-memory">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"
+          stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="1" y="3" width="10" height="6" rx="1.5"/>
+          <circle cx="3.5" cy="6" r="0.8" fill="currentColor" stroke="none"/>
+          <circle cx="6" cy="6" r="0.8" fill="currentColor" stroke="none"/>
+          <circle cx="8.5" cy="6" r="0.8" fill="currentColor" stroke="none"/>
+        </svg>
+        Memory
+      </button>
+    </div>
+
+    <!-- ══════════════════════════════════
+         PANEL: CHATS
+         ══════════════════════════════════ -->
+    <div class="sidebar-panel active" id="panel-chats" role="tabpanel" aria-label="Chats">
+
+      <!-- Search conversations -->
+      <div class="sidebar-search-wrap">
+        <div class="sidebar-search" role="search">
+          <span class="sidebar-search-icon" aria-hidden="true">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"
+              stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+              <circle cx="5" cy="5" r="3.5"/>
+              <line x1="7.5" y1="7.5" x2="11" y2="11"/>
+            </svg>
+          </span>
+          <input
+            type="search"
+            id="conv-search"
+            class="sidebar-search-input"
+            placeholder="Search conversations…"
+            aria-label="Search conversations"
+            autocomplete="off"
+            spellcheck="false"
+          />
+        </div>
+      </div>
+
+      <!-- Today's chats -->
+      <div class="conv-group" id="conv-group-today">
+        <div class="sidebar-section-label" id="label-today">Today</div>
+        <nav
+          class="conversation-list"
+          id="conversation-list-today"
+          aria-label="Today's conversations"
+          role="list"
+        >
+          <div class="conv-empty" id="conv-empty-today" aria-live="polite">
+            <span>No conversations yet</span>
+          </div>
+        </nav>
+      </div>
+
+      <!-- Earlier chats -->
+      <div class="conv-group" id="conv-group-earlier" style="display:none;">
+        <div class="sidebar-section-label">Earlier</div>
+        <nav
+          class="conversation-list"
+          id="conversation-list-earlier"
+          aria-label="Earlier conversations"
+          role="list"
+        >
+        </nav>
+      </div>
+
+    </div>
+    <!-- /panel-chats -->
+
+    <!-- ══════════════════════════════════
+         PANEL: PROJECTS
+         ══════════════════════════════════ -->
+    <div class="sidebar-panel" id="panel-projects" role="tabpanel" aria-label="Projects">
+
+      <div class="projects-panel-header">
+        <span class="projects-panel-title">Projects</span>
+        <button class="btn-new-project" id="btn-new-project" aria-label="Create new project">
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none"
-            stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
-            <circle cx="5" cy="5" r="3.5"/>
-            <line x1="7.5" y1="7.5" x2="11" y2="11"/>
+            stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+            <line x1="6" y1="2" x2="6" y2="10"/>
+            <line x1="2" y1="6" x2="10" y2="6"/>
           </svg>
-        </span>
-        <input
-          type="search"
-          id="conv-search"
-          class="sidebar-search-input"
-          placeholder="Search conversations…"
-          aria-label="Search conversations"
-          autocomplete="off"
-          spellcheck="false"
-        />
+        </button>
+      </div>
+
+      <div class="project-list" id="project-list" role="list" aria-label="Your projects">
+        <!-- Populated by projects.js -->
+      </div>
+
+    </div>
+    <!-- /panel-projects -->
+
+    <!-- ══════════════════════════════════
+         PANEL: MEMORY (stub — Phase 12)
+         ══════════════════════════════════ -->
+    <div class="sidebar-panel" id="panel-memory" role="tabpanel" aria-label="Memory">
+      <div style="padding: var(--sp-8) var(--sp-4); text-align:center; color: var(--text-500);">
+        <div style="font-family: var(--font-title); font-size: 11px; letter-spacing: 0.1em; margin-bottom: var(--sp-2);">MEMORY</div>
+        <div style="font-size: 12px; color: var(--text-500);">Coming in Phase 12</div>
       </div>
     </div>
-
-    <!-- ── Sidebar: Today's chats ── -->
-    <div class="conv-group" id="conv-group-today">
-      <div class="sidebar-section-label" id="label-today">Today</div>
-      <nav
-        class="conversation-list"
-        id="conversation-list-today"
-        aria-label="Today's conversations"
-        role="list"
-      >
-        <!-- Populated dynamically by chat.js -->
-        <!-- Placeholder shown before any chats exist -->
-        <div class="conv-empty" id="conv-empty-today" aria-live="polite">
-          <span>No conversations yet</span>
-        </div>
-      </nav>
-    </div>
-
-    <!-- ── Sidebar: Earlier chats ── -->
-    <div class="conv-group" id="conv-group-earlier" style="display:none;">
-      <div class="sidebar-section-label">Earlier</div>
-      <nav
-        class="conversation-list"
-        id="conversation-list-earlier"
-        aria-label="Earlier conversations"
-        role="list"
-      >
-      </nav>
-    </div>
+    <!-- /panel-memory -->
 
     <!-- ── Sidebar: Spacer ── -->
     <div class="sidebar-spacer" aria-hidden="true"></div>
@@ -1000,11 +1073,10 @@
      SCRIPTS — dependency order
      ui.js → api.js → chat.js → app.js
      ═══════════════════════════════════════════════════════════ -->
-<script src="script/ui.js"></script>
-<script src="script/api.js"></script>
-<script src="script/chat.js"></script>
-<script src="script/slash.js"></script>
-<script src="script/app.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/api.js"></script>
+<script src="js/chat.js"></script>
+<script src="js/app.js"></script>
 
 </body>
 </html>

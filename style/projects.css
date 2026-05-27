@@ -1,0 +1,1348 @@
+/* ═══════════════════════════════════════════════════════════════
+   ALTAS — PROJECTS.CSS
+   Sidebar nav tabs · Project panel · Workspace cards
+   Project creation · File list · Notes · Context switcher
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────────────────────
+   1. SIDEBAR NAV TABS
+   Sits between the logo/new-chat and the conversation list.
+   Three tabs: Chats · Projects · Memory
+   ───────────────────────────────────────────────────────────── */
+
+.sidebar-nav-tabs {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 0 var(--sp-4) var(--sp-3);
+  flex-shrink: 0;
+}
+
+.sidebar-nav-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 6px var(--sp-2);
+  border-radius: var(--r-md);
+  font-family: var(--font-title);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--text-400);
+  cursor: pointer;
+  background: transparent;
+  border: 0.5px solid transparent;
+  transition:
+    background  var(--dur-base) var(--ease-out),
+    color       var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.sidebar-nav-tab svg {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  opacity: 0.7;
+  transition: opacity var(--dur-base) var(--ease-out);
+}
+
+.sidebar-nav-tab:hover {
+  background: var(--glass-2);
+  color: var(--text-200);
+  border-color: var(--glass-border);
+}
+
+.sidebar-nav-tab:hover svg {
+  opacity: 1;
+}
+
+.sidebar-nav-tab.active {
+  background: var(--accent-glow);
+  border-color: rgba(123,108,255,0.3);
+  color: var(--accent-bright);
+}
+
+.sidebar-nav-tab.active svg {
+  opacity: 1;
+  color: var(--accent-bright);
+}
+
+/* Tab underline accent */
+.sidebar-nav-tab.active::after {
+  content: none; /* Using background instead */
+}
+
+/* ─────────────────────────────────────────────────────────────
+   2. SIDEBAR PANELS
+   Each tab shows one panel. Non-active panels are hidden.
+   Panels: #panel-chats · #panel-projects · #panel-memory
+   ───────────────────────────────────────────────────────────── */
+
+.sidebar-panel {
+  display: none;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.sidebar-panel.active {
+  display: flex;
+  animation: panel-fade-in 0.22s cubic-bezier(0.16,1,0.3,1) forwards;
+}
+
+@keyframes panel-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   3. PROJECTS PANEL HEADER
+   ───────────────────────────────────────────────────────────── */
+
+.projects-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--sp-4) var(--sp-3);
+  flex-shrink: 0;
+}
+
+.projects-panel-title {
+  font-family: var(--font-title);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--text-300);
+  text-transform: uppercase;
+}
+
+.btn-new-project {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--r-sm);
+  background: var(--glass-2);
+  border: 0.5px solid var(--glass-border);
+  color: var(--text-400);
+  cursor: pointer;
+  transition:
+    background var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out),
+    color var(--dur-base) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+
+.btn-new-project:hover {
+  background: var(--accent-glow);
+  border-color: rgba(123,108,255,0.3);
+  color: var(--accent-bright);
+  transform: scale(1.08);
+}
+
+.btn-new-project svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   4. PROJECT LIST (sidebar)
+   ───────────────────────────────────────────────────────────── */
+
+.project-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 var(--sp-3);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* Empty state */
+.project-list-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-8) var(--sp-4);
+  text-align: center;
+}
+
+.project-list-empty-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--r-md);
+  background: var(--glass-1);
+  border: 0.5px solid var(--glass-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-500);
+}
+
+.project-list-empty-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.project-list-empty-text {
+  font-size: 12px;
+  color: var(--text-400);
+  line-height: 1.5;
+}
+
+.project-list-empty-hint {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-500);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   5. PROJECT ITEM (sidebar list row)
+   ───────────────────────────────────────────────────────────── */
+
+.project-item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-2);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  position: relative;
+  border: 0.5px solid transparent;
+  transition:
+    background var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+  user-select: none;
+}
+
+.project-item:hover {
+  background: var(--glass-2);
+  transform: translateX(2px);
+}
+
+.project-item.active {
+  background: var(--glass-3);
+  border-color: var(--glass-border);
+}
+
+/* Active accent line */
+.project-item.active::before {
+  content: '';
+  position: absolute;
+  left: -2px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2px;
+  height: 55%;
+  background: var(--accent);
+  border-radius: var(--r-full);
+  box-shadow: 0 0 6px var(--accent-glow);
+}
+
+/* Project colour dot */
+.project-color-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: box-shadow var(--dur-base) var(--ease-out);
+}
+
+.project-item.active .project-color-dot,
+.project-item:hover .project-color-dot {
+  box-shadow: 0 0 6px currentColor;
+}
+
+/* Project name */
+.project-item-name {
+  flex: 1;
+  font-size: 13px;
+  color: var(--text-300);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color var(--dur-base) var(--ease-out);
+}
+
+.project-item:hover .project-item-name,
+.project-item.active .project-item-name {
+  color: var(--text-100);
+}
+
+/* Project meta (conversation count) */
+.project-item-meta {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-500);
+  flex-shrink: 0;
+  transition: color var(--dur-base) var(--ease-out);
+}
+
+.project-item:hover .project-item-meta {
+  color: var(--text-400);
+}
+
+/* Project options button (⋯) */
+.project-item-options {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--r-sm);
+  background: transparent;
+  border: none;
+  color: var(--text-500);
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    opacity var(--dur-base) var(--ease-out),
+    background var(--dur-base) var(--ease-out),
+    color var(--dur-base) var(--ease-out);
+  flex-shrink: 0;
+}
+
+.project-item:hover .project-item-options {
+  opacity: 1;
+}
+
+.project-item-options:hover {
+  background: var(--glass-3);
+  color: var(--text-100);
+}
+
+.project-item-options svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   6. PROJECT WORKSPACE PANEL
+   Full panel that slides in over the chat when a project
+   is opened. Glass overlay, not replacing chat — floats above.
+   ───────────────────────────────────────────────────────────── */
+
+#project-workspace {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  display: flex;
+  align-items: stretch;
+  pointer-events: none;
+}
+
+#project-workspace.open {
+  pointer-events: auto;
+}
+
+/* Backdrop */
+.project-workspace-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(3,3,6,0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  opacity: 0;
+  transition: opacity var(--dur-slow) var(--ease-out);
+}
+
+#project-workspace.open .project-workspace-backdrop {
+  opacity: 1;
+}
+
+/* Panel — slides in from right */
+.project-workspace-panel {
+  position: relative;
+  z-index: 1;
+  width: min(760px, 85vw);
+  height: 100%;
+  margin-left: auto;
+  background: rgba(9,9,18,0.97);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border-left: 0.5px solid var(--glass-border);
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform var(--dur-enter) var(--ease-out);
+  overflow: hidden;
+}
+
+#project-workspace.open .project-workspace-panel {
+  transform: translateX(0);
+}
+
+/* Top accent line */
+.project-workspace-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--accent),
+    transparent
+  );
+  opacity: 0.5;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   7. WORKSPACE HEADER
+   ───────────────────────────────────────────────────────────── */
+
+.project-workspace-header {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  padding: var(--sp-5) var(--sp-6);
+  border-bottom: 0.5px solid var(--glass-border);
+  flex-shrink: 0;
+}
+
+.project-workspace-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 0 8px currentColor;
+}
+
+.project-workspace-name {
+  font-family: var(--font-title);
+  font-size: 18px;
+  letter-spacing: 0.08em;
+  color: var(--text-100);
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Edit name inline */
+.project-workspace-name[contenteditable="true"] {
+  outline: none;
+  border-bottom: 1px solid var(--accent);
+  padding-bottom: 1px;
+}
+
+.project-workspace-header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex-shrink: 0;
+}
+
+.workspace-header-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px var(--sp-3);
+  border-radius: var(--r-md);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-300);
+  background: var(--glass-2);
+  border: 0.5px solid var(--glass-border);
+  cursor: pointer;
+  transition:
+    background var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out),
+    color var(--dur-base) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+
+.workspace-header-btn:hover {
+  background: var(--glass-3);
+  border-color: var(--glass-border-hover);
+  color: var(--text-100);
+  transform: translateY(-1px);
+}
+
+.workspace-header-btn svg {
+  width: 12px;
+  height: 12px;
+}
+
+.workspace-header-btn.danger:hover {
+  border-color: rgba(232,89,60,0.3);
+  color: var(--danger);
+  background: rgba(232,89,60,0.06);
+}
+
+.workspace-close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--r-sm);
+  background: transparent;
+  border: 0.5px solid transparent;
+  color: var(--text-400);
+  cursor: pointer;
+  transition:
+    background var(--dur-base) var(--ease-out),
+    color var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out);
+}
+
+.workspace-close-btn:hover {
+  background: var(--glass-2);
+  border-color: var(--glass-border);
+  color: var(--text-100);
+}
+
+.workspace-close-btn svg {
+  width: 13px;
+  height: 13px;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   8. WORKSPACE TABS (inner navigation)
+   Conversations · Notes · Files · Context
+   ───────────────────────────────────────────────────────────── */
+
+.workspace-tabs {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 0 var(--sp-6);
+  border-bottom: 0.5px solid var(--glass-border);
+  flex-shrink: 0;
+}
+
+.workspace-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: var(--sp-3) var(--sp-4);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--text-400);
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  border-bottom: 1.5px solid transparent;
+  transition:
+    color var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out);
+  white-space: nowrap;
+  position: relative;
+  bottom: -0.5px; /* Overlap the border-bottom of parent */
+}
+
+.workspace-tab svg {
+  width: 12px;
+  height: 12px;
+  opacity: 0.7;
+}
+
+.workspace-tab:hover {
+  color: var(--text-200);
+}
+
+.workspace-tab.active {
+  color: var(--accent-bright);
+  border-bottom-color: var(--accent);
+}
+
+.workspace-tab.active svg {
+  opacity: 1;
+}
+
+/* Badge on tab (e.g. file count) */
+.workspace-tab-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  background: var(--glass-2);
+  border-radius: var(--r-full);
+  font-size: 9px;
+  color: var(--text-400);
+  transition: background var(--dur-base), color var(--dur-base);
+}
+
+.workspace-tab.active .workspace-tab-badge {
+  background: var(--accent-glow);
+  color: var(--accent-bright);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   9. WORKSPACE CONTENT AREA
+   ───────────────────────────────────────────────────────────── */
+
+.workspace-content {
+  flex: 1;
+  overflow-y: auto;
+  position: relative;
+}
+
+.workspace-pane {
+  display: none;
+  padding: var(--sp-6);
+  min-height: 100%;
+  animation: panel-fade-in 0.2s var(--ease-out) forwards;
+}
+
+.workspace-pane.active {
+  display: block;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   10. CONVERSATIONS PANE
+   List of conversations belonging to this project
+   ───────────────────────────────────────────────────────────── */
+
+.workspace-conv-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.workspace-conv-item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--glass-1);
+  border: 0.5px solid var(--glass-border);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition:
+    background var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+
+.workspace-conv-item:hover {
+  background: var(--glass-2);
+  border-color: var(--glass-border-hover);
+  transform: translateX(3px);
+}
+
+.workspace-conv-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-400);
+  flex-shrink: 0;
+}
+
+.workspace-conv-title {
+  flex: 1;
+  font-size: 13px;
+  color: var(--text-200);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.workspace-conv-date {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-500);
+  flex-shrink: 0;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   11. NOTES PANE
+   Freeform markdown notes tied to the project
+   ───────────────────────────────────────────────────────────── */
+
+.workspace-notes-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-4);
+  flex-wrap: wrap;
+}
+
+.notes-toolbar-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px var(--sp-3);
+  border-radius: var(--r-sm);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-400);
+  background: var(--glass-1);
+  border: 0.5px solid var(--glass-border);
+  cursor: pointer;
+  transition:
+    background var(--dur-base) var(--ease-out),
+    color var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out);
+}
+
+.notes-toolbar-btn:hover {
+  background: var(--glass-2);
+  color: var(--text-100);
+  border-color: var(--glass-border-hover);
+}
+
+.notes-toolbar-btn svg {
+  width: 12px;
+  height: 12px;
+}
+
+.notes-toolbar-sep {
+  width: 0.5px;
+  height: 18px;
+  background: var(--glass-border);
+}
+
+.notes-save-indicator {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-500);
+  margin-left: auto;
+  transition: color 0.3s ease;
+}
+
+.notes-save-indicator.saved {
+  color: var(--success);
+}
+
+/* Notes textarea */
+#workspace-notes-editor {
+  width: 100%;
+  min-height: 320px;
+  background: rgba(0,0,0,0.25);
+  border: 0.5px solid var(--glass-border);
+  border-radius: var(--r-md);
+  padding: var(--sp-5);
+  font-family: var(--font-display);
+  font-size: 14px;
+  color: var(--text-100);
+  line-height: 1.75;
+  resize: vertical;
+  outline: none;
+  caret-color: var(--accent-bright);
+  transition:
+    border-color var(--dur-base) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out);
+}
+
+#workspace-notes-editor:focus {
+  border-color: rgba(123,108,255,0.3);
+  box-shadow: 0 0 0 1px rgba(123,108,255,0.08);
+}
+
+#workspace-notes-editor::placeholder {
+  color: var(--text-500);
+  font-style: italic;
+}
+
+/* Notes rendered preview */
+.workspace-notes-preview {
+  padding: var(--sp-2) 0;
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--text-200);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   12. FILES PANE
+   List of files attached to the project
+   ───────────────────────────────────────────────────────────── */
+
+.workspace-files-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--sp-4);
+}
+
+.workspace-files-title {
+  font-family: var(--font-title);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--text-400);
+  text-transform: uppercase;
+}
+
+.btn-upload-file {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px var(--sp-3);
+  background: var(--glass-2);
+  border: 0.5px solid var(--glass-border);
+  border-radius: var(--r-md);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-300);
+  cursor: pointer;
+  transition:
+    background var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out),
+    color var(--dur-base) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+
+.btn-upload-file:hover {
+  background: var(--accent-glow);
+  border-color: rgba(123,108,255,0.3);
+  color: var(--accent-bright);
+  transform: translateY(-1px);
+}
+
+.btn-upload-file svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* File drop zone */
+.file-drop-zone {
+  border: 1px dashed rgba(123,108,255,0.2);
+  border-radius: var(--r-lg);
+  padding: var(--sp-8) var(--sp-6);
+  text-align: center;
+  cursor: pointer;
+  transition:
+    border-color var(--dur-base) var(--ease-out),
+    background var(--dur-base) var(--ease-out);
+  margin-bottom: var(--sp-4);
+}
+
+.file-drop-zone:hover,
+.file-drop-zone.drag-over {
+  border-color: rgba(123,108,255,0.45);
+  background: rgba(123,108,255,0.04);
+}
+
+.file-drop-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--r-md);
+  background: var(--glass-1);
+  border: 0.5px solid var(--glass-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-400);
+  margin: 0 auto var(--sp-3);
+}
+
+.file-drop-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.file-drop-label {
+  font-size: 13px;
+  color: var(--text-300);
+  margin-bottom: 4px;
+}
+
+.file-drop-hint {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-500);
+}
+
+/* File list */
+.workspace-file-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.workspace-file-item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--glass-1);
+  border: 0.5px solid var(--glass-border);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition:
+    background var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out);
+}
+
+.workspace-file-item:hover {
+  background: var(--glass-2);
+  border-color: var(--glass-border-hover);
+}
+
+.workspace-file-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--r-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* File type colours */
+.workspace-file-icon[data-ext="py"]   { background: rgba(74,158,255,0.1);  color: var(--info);    border: 0.5px solid rgba(74,158,255,0.2);  }
+.workspace-file-icon[data-ext="js"]   { background: rgba(242,166,35,0.1);  color: var(--warning); border: 0.5px solid rgba(242,166,35,0.2);  }
+.workspace-file-icon[data-ext="ts"]   { background: rgba(74,158,255,0.1);  color: var(--info);    border: 0.5px solid rgba(74,158,255,0.2);  }
+.workspace-file-icon[data-ext="md"]   { background: rgba(255,255,255,0.06); color: var(--text-300); border: 0.5px solid rgba(255,255,255,0.1); }
+.workspace-file-icon[data-ext="pdf"]  { background: rgba(232,89,60,0.1);   color: var(--danger);  border: 0.5px solid rgba(232,89,60,0.2);   }
+.workspace-file-icon[data-ext="json"] { background: rgba(78,204,163,0.1);  color: var(--success); border: 0.5px solid rgba(78,204,163,0.2);  }
+.workspace-file-icon[data-ext="css"]  { background: rgba(155,143,255,0.1); color: var(--accent-bright); border: 0.5px solid rgba(155,143,255,0.2); }
+.workspace-file-icon[data-ext="html"] { background: rgba(232,89,60,0.08);  color: var(--danger);  border: 0.5px solid rgba(232,89,60,0.15);  }
+
+.workspace-file-meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.workspace-file-name {
+  font-size: 13px;
+  color: var(--text-200);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 2px;
+}
+
+.workspace-file-info {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-500);
+}
+
+.workspace-file-actions {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity var(--dur-base) var(--ease-out);
+}
+
+.workspace-file-item:hover .workspace-file-actions {
+  opacity: 1;
+}
+
+.workspace-file-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--r-sm);
+  background: var(--glass-2);
+  border: 0.5px solid var(--glass-border);
+  color: var(--text-400);
+  cursor: pointer;
+  transition: color var(--dur-base), background var(--dur-base);
+}
+
+.workspace-file-btn:hover {
+  color: var(--text-100);
+  background: var(--glass-3);
+}
+
+.workspace-file-btn.delete:hover {
+  color: var(--danger);
+  border-color: rgba(232,89,60,0.3);
+  background: rgba(232,89,60,0.06);
+}
+
+.workspace-file-btn svg {
+  width: 10px;
+  height: 10px;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   13. CONTEXT PANE
+   Project-level context/instructions injected into ALTAS
+   when this project is active
+   ───────────────────────────────────────────────────────────── */
+
+.workspace-context-desc {
+  font-size: 13px;
+  color: var(--text-300);
+  line-height: 1.7;
+  margin-bottom: var(--sp-4);
+  padding: var(--sp-3) var(--sp-4);
+  background: rgba(123,108,255,0.04);
+  border: 0.5px solid rgba(123,108,255,0.12);
+  border-radius: var(--r-md);
+}
+
+#workspace-context-editor {
+  width: 100%;
+  min-height: 200px;
+  background: rgba(0,0,0,0.25);
+  border: 0.5px solid var(--glass-border);
+  border-radius: var(--r-md);
+  padding: var(--sp-5);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-100);
+  line-height: 1.75;
+  resize: vertical;
+  outline: none;
+  caret-color: var(--accent-bright);
+  transition:
+    border-color var(--dur-base) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out);
+}
+
+#workspace-context-editor:focus {
+  border-color: rgba(123,108,255,0.3);
+  box-shadow: 0 0 0 1px rgba(123,108,255,0.08);
+}
+
+.workspace-context-save {
+  margin-top: var(--sp-3);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--sp-2);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   14. NEW PROJECT MODAL
+   Glass modal for creating a new project
+   ───────────────────────────────────────────────────────────── */
+
+#new-project-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.new-project-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.new-project-dialog {
+  position: relative;
+  z-index: 1;
+  width: 420px;
+  max-width: calc(100vw - 32px);
+  background: rgba(10,10,22,0.98);
+  border: 0.5px solid var(--glass-border);
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  backdrop-filter: blur(40px);
+  animation: overlay-enter var(--dur-enter) var(--ease-out) forwards;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+}
+
+/* Top glow */
+.new-project-dialog::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 20%;
+  right: 20%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0.6;
+}
+
+.new-project-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-5) var(--sp-6);
+  border-bottom: 0.5px solid var(--glass-border);
+}
+
+.new-project-title {
+  font-family: var(--font-title);
+  font-size: 15px;
+  letter-spacing: 0.08em;
+  color: var(--text-100);
+}
+
+.new-project-body {
+  padding: var(--sp-5) var(--sp-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+}
+
+/* Form groups */
+.new-project-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.new-project-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-400);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.new-project-input {
+  padding: var(--sp-3) var(--sp-4);
+  background: rgba(0,0,0,0.3);
+  border: 0.5px solid var(--glass-border);
+  border-radius: var(--r-md);
+  font-family: var(--font-display);
+  font-size: 14px;
+  color: var(--text-100);
+  outline: none;
+  caret-color: var(--accent-bright);
+  transition:
+    border-color var(--dur-base) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out);
+}
+
+.new-project-input:focus {
+  border-color: rgba(123,108,255,0.4);
+  box-shadow: 0 0 0 1px rgba(123,108,255,0.1);
+}
+
+.new-project-input::placeholder {
+  color: var(--text-500);
+}
+
+/* Colour picker row */
+.project-color-picker {
+  display: flex;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+}
+
+.project-color-swatch {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition:
+    transform var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out);
+}
+
+.project-color-swatch:hover {
+  transform: scale(1.15);
+}
+
+.project-color-swatch.selected {
+  border-color: rgba(255,255,255,0.7);
+  box-shadow: 0 0 8px currentColor;
+  transform: scale(1.1);
+}
+
+/* Project icon/emoji picker */
+.project-icon-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.project-icon-option {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--r-sm);
+  background: var(--glass-1);
+  border: 0.5px solid var(--glass-border);
+  font-size: 16px;
+  cursor: pointer;
+  transition:
+    background var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+  user-select: none;
+}
+
+.project-icon-option:hover {
+  background: var(--glass-2);
+  transform: scale(1.1);
+}
+
+.project-icon-option.selected {
+  background: var(--accent-glow);
+  border-color: rgba(123,108,255,0.4);
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+
+.new-project-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--sp-3);
+  padding: var(--sp-4) var(--sp-6);
+  border-top: 0.5px solid var(--glass-border);
+  background: rgba(0,0,0,0.2);
+}
+
+.new-project-btn-cancel {
+  padding: var(--sp-2) var(--sp-5);
+  background: transparent;
+  border: 0.5px solid var(--glass-border);
+  border-radius: var(--r-md);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-300);
+  cursor: pointer;
+  transition:
+    background var(--dur-base) var(--ease-out),
+    color var(--dur-base) var(--ease-out);
+}
+
+.new-project-btn-cancel:hover {
+  background: var(--glass-2);
+  color: var(--text-100);
+}
+
+.new-project-btn-create {
+  padding: var(--sp-2) var(--sp-5);
+  background: var(--accent);
+  border: none;
+  border-radius: var(--r-md);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  color: #fff;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition:
+    background var(--dur-base) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out);
+  box-shadow: 0 4px 12px rgba(123,108,255,0.3);
+}
+
+.new-project-btn-create:hover {
+  background: var(--accent-bright);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(123,108,255,0.4);
+}
+
+.new-project-btn-create:active {
+  transform: translateY(0);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   15. PROJECT CONTEXT INDICATOR
+   Small pill in the header showing which project is active
+   ───────────────────────────────────────────────────────────── */
+
+#active-project-indicator {
+  display: none;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px 3px 6px;
+  background: var(--glass-1);
+  border: 0.5px solid var(--glass-border);
+  border-radius: var(--r-full);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-300);
+  cursor: pointer;
+  transition:
+    background var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out),
+    color var(--dur-base) var(--ease-out);
+}
+
+#active-project-indicator.visible {
+  display: flex;
+}
+
+#active-project-indicator:hover {
+  background: var(--glass-2);
+  border-color: var(--glass-border-hover);
+  color: var(--text-100);
+}
+
+.active-project-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.active-project-name {
+  max-width: 120px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   16. CONTEXT MENU (right-click / ⋯ on project)
+   ───────────────────────────────────────────────────────────── */
+
+.project-context-menu {
+  position: fixed;
+  z-index: 9000;
+  background: rgba(10,10,22,0.97);
+  border: 0.5px solid var(--glass-border);
+  border-radius: var(--r-md);
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  min-width: 160px;
+  animation: scale-in 0.15s var(--ease-out) forwards;
+  backdrop-filter: blur(20px);
+}
+
+.project-context-item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-2) var(--sp-4);
+  font-size: 13px;
+  color: var(--text-200);
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+
+.project-context-item:hover {
+  background: var(--glass-2);
+}
+
+.project-context-item.danger {
+  color: var(--danger);
+}
+
+.project-context-item.danger:hover {
+  background: rgba(232,89,60,0.08);
+}
+
+.project-context-item svg {
+  width: 12px;
+  height: 12px;
+  opacity: 0.7;
+}
+
+.project-context-sep {
+  height: 0.5px;
+  background: var(--glass-border);
+  margin: 2px 0;
+}

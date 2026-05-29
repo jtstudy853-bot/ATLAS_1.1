@@ -634,15 +634,34 @@ const ALTASSidebar = (() => {
 
 
 /* ─────────────────────────────────────────────────────────────
-   7. SETTINGS PANEL
+   7. SETTINGS PANEL — STUB
+   Full implementation is in settings.js (loaded after ui.js).
+   This stub only provides getSettings() for early callers.
+   settings.js overwrites ALTAS.Settings on window.ALTAS.
    ───────────────────────────────────────────────────────────── */
 
-const ALTASSettings = (() => {
+const ALTASSettingsStub = (() => {
+
+  function getSettings() {
+    try {
+      const raw = localStorage.getItem('altas_settings');
+      return raw ? JSON.parse(raw) : {};
+    } catch { return {}; }
+  }
+
+  function init() { /* delegated to settings.js */ }
+
+  return { init, getSettings };
+
+})();
+
+/* Temporary placeholder — settings.js replaces this */
+const _ALTASSettingsTemp = (() => {
 
   let panel = null;
 
   function init() {
-    panel = document.getElementById('settings-panel');
+    panel = document.getElementById('settings-panel-legacy');
     const openBtn  = document.getElementById('btn-settings');
     const closeBtn = document.getElementById('settings-close');
     const backdrop = document.getElementById('settings-backdrop');
@@ -736,7 +755,7 @@ const ALTASSettings = (() => {
     } catch { return {}; }
   }
 
-  return { init, getSettings };
+  return { init, getSettings: () => ({}) };
 
 })();
 
@@ -1077,7 +1096,7 @@ window.ALTAS = {
   Textarea:       ALTASTextarea,
   Input:          ALTASInput,
   Sidebar:        ALTASSidebar,
-  Settings:       ALTASSettings,
+  Settings:       ALTASSettingsStub, /* Overwritten by settings.js after load */
   Shortcuts:      ALTASShortcuts,
   Scroll:         ALTASScroll,
   ContextMeter:   ALTASContextMeter,

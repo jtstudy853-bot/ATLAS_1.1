@@ -819,3 +819,10 @@ if (document.readyState === 'loading') {
 } else {
   ALTASSettings.init();
 }
+
+/* Overwrite the stub registered by ui.js with the full implementation */
+if (window.ALTAS) {
+  window.ALTAS.Settings = ALTASSettings;
+  /* Alias getSettings so api.js and app.js don't break */
+  window.ALTAS.Settings.getSettings = () => ALTASSettings.getConfig();
+}

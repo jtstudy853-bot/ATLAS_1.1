@@ -8,131 +8,100 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="ALTAS" />
-
-  <!-- Open Graph -->
   <meta property="og:title" content="ALTAS — Personal AI" />
   <meta property="og:description" content="Your adaptive intelligence system." />
   <meta property="og:type" content="website" />
-
   <title>ALTAS — Personal AI</title>
 
-  <!-- Preconnect for fonts -->
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-
-  <!-- Blanka — structural UI labels, titles, section headers (not AI content) -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap" />
   <link rel="stylesheet" href="https://fonts.cdnfonts.com/css/blanka" />
 
-  <!-- CSS load order matters -->
-  <link rel="stylesheet" href="css/base.css" />
-  <link rel="stylesheet" href="css/layout.css" />
-  <link rel="stylesheet" href="css/components.css" />
-  <link rel="stylesheet" href="css/chat.css" />
-  <link rel="stylesheet" href="css/animations.css" />
-  <link rel="stylesheet" href="css/cursor.css" />
-  <link rel="stylesheet" href="css/tool-cards.css" />
-  <link rel="stylesheet" href="css/slash.css" />
-  <link rel="stylesheet" href="css/projects.css" />
+  <!-- CSS — load order matters -->
+  <link rel="stylesheet" href="style/base.css" />
+  <link rel="stylesheet" href="style/layout.css" />
+  <link rel="stylesheet" href="style/components.css" />
+  <link rel="stylesheet" href="style/chat.css" />
+  <link rel="stylesheet" href="style/animations.css" />
+  <link rel="stylesheet" href="style/cursor.css" />
+  <link rel="stylesheet" href="style/tool-cards.css" />
+  <link rel="stylesheet" href="style/slash.css" />
+  <link rel="stylesheet" href="style/projects.css" />
+  <link rel="stylesheet" href="style/memory.css" />
+  <link rel="stylesheet" href="style/settings.css" />
+  <link rel="stylesheet" href="style/viz.css" />
 
-  <!-- Inline critical: prevent flash -->
+  <!-- Boot flash prevention -->
   <style>
     html { background: #030306; }
     #app { opacity: 0; }
     #app.booted { opacity: 1; transition: opacity 0.6s cubic-bezier(0.16,1,0.3,1); }
+
+    /* Boot screen */
     .boot-screen {
       position: fixed; inset: 0; z-index: 99999;
       background: #030306;
       display: flex; flex-direction: column;
       align-items: center; justify-content: center; gap: 24px;
-      transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1),
-                  visibility 0.8s;
+      transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), visibility 0.8s;
     }
     .boot-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
     .boot-logo-svg { animation: boot-pulse 1.4s ease-in-out infinite; }
     @keyframes boot-pulse {
-      0%,100% { opacity: 0.6; transform: scale(0.97); }
-      50%      { opacity: 1;   transform: scale(1);    }
+      0%,100% { opacity: 0.6; transform: scale(0.97); filter: drop-shadow(0 0 0px rgba(123,108,255,0)); }
+      50%      { opacity: 1;   transform: scale(1);    filter: drop-shadow(0 0 18px rgba(123,108,255,0.45)); }
     }
-    .boot-bar {
-      width: 160px; height: 1px;
-      background: rgba(255,255,255,0.06);
-      border-radius: 999px; overflow: hidden;
-    }
-    .boot-bar-fill {
-      height: 100%; width: 0%;
-      background: linear-gradient(90deg, #4A3FCC, #7B6CFF, #9B8FFF);
-      border-radius: 999px;
-      transition: width 0.4s cubic-bezier(0.16,1,0.3,1);
-    }
-    .boot-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 10px; letter-spacing: 0.12em;
-      text-transform: uppercase; color: rgba(255,255,255,0.25);
-    }
+    .boot-bar { width: 160px; height: 1px; background: rgba(255,255,255,0.06); border-radius: 999px; overflow: hidden; }
+    .boot-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg,#4A3FCC,#7B6CFF,#9B8FFF); border-radius: 999px; transition: width 0.4s cubic-bezier(0.16,1,0.3,1); }
+    .boot-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.25); }
   </style>
 </head>
 
 <body class="grain">
 
-<!-- ═══════════════════════════════════════════════════════════
-     BOOT SCREEN — shown while JS initialises
-     ═══════════════════════════════════════════════════════════ -->
+<!-- ═══════════════════════════════════════════════════════
+     BOOT SCREEN
+     ═══════════════════════════════════════════════════════ -->
 <div id="boot-screen" class="boot-screen" role="status" aria-label="ALTAS loading">
-  <svg class="boot-logo-svg" width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <!-- Outer hex -->
-    <polygon points="28,3 51,16 51,40 28,53 5,40 5,16"
-      fill="none" stroke="rgba(123,108,255,0.35)" stroke-width="0.75"/>
-    <!-- Mid hex -->
-    <polygon points="28,9 45,19 45,37 28,47 11,37 11,19"
-      fill="none" stroke="rgba(123,108,255,0.2)" stroke-width="0.75"/>
-    <!-- Inner hex filled -->
-    <polygon points="28,15 39,21.5 39,34.5 28,41 17,34.5 17,21.5"
-      fill="rgba(123,108,255,0.06)" stroke="rgba(123,108,255,0.4)" stroke-width="0.75"/>
-    <!-- Core -->
+  <svg class="boot-logo-svg" width="56" height="56" viewBox="0 0 56 56" fill="none" aria-hidden="true">
+    <polygon points="28,3 51,16 51,40 28,53 5,40 5,16" fill="none" stroke="rgba(123,108,255,0.35)" stroke-width="0.75"/>
+    <polygon points="28,9 45,19 45,37 28,47 11,37 11,19" fill="none" stroke="rgba(123,108,255,0.2)" stroke-width="0.75"/>
+    <polygon points="28,15 39,21.5 39,34.5 28,41 17,34.5 17,21.5" fill="rgba(123,108,255,0.06)" stroke="rgba(123,108,255,0.4)" stroke-width="0.75"/>
     <circle cx="28" cy="28" r="5.5" fill="#7B6CFF" opacity="0.9"/>
     <circle cx="28" cy="28" r="3"   fill="#C4BFFF"/>
-    <!-- Vertex dots -->
-    <circle cx="28"  cy="3"  r="1.5" fill="rgba(123,108,255,0.7)"/>
-    <circle cx="51"  cy="16" r="1.5" fill="rgba(123,108,255,0.5)"/>
-    <circle cx="51"  cy="40" r="1.5" fill="rgba(123,108,255,0.5)"/>
-    <circle cx="28"  cy="53" r="1.5" fill="rgba(123,108,255,0.7)"/>
-    <circle cx="5"   cy="40" r="1.5" fill="rgba(123,108,255,0.5)"/>
-    <circle cx="5"   cy="16" r="1.5" fill="rgba(123,108,255,0.5)"/>
+    <circle cx="28" cy="3"  r="1.5" fill="rgba(123,108,255,0.7)"/>
+    <circle cx="51" cy="16" r="1.5" fill="rgba(123,108,255,0.5)"/>
+    <circle cx="51" cy="40" r="1.5" fill="rgba(123,108,255,0.5)"/>
+    <circle cx="28" cy="53" r="1.5" fill="rgba(123,108,255,0.7)"/>
+    <circle cx="5"  cy="40" r="1.5" fill="rgba(123,108,255,0.5)"/>
+    <circle cx="5"  cy="16" r="1.5" fill="rgba(123,108,255,0.5)"/>
   </svg>
   <div class="boot-bar"><div class="boot-bar-fill" id="boot-bar-fill"></div></div>
   <div class="boot-label" id="boot-label">Initialising</div>
 </div>
 
 
-<!-- ═══════════════════════════════════════════════════════════
+<!-- ═══════════════════════════════════════════════════════
      APP ROOT
-     ═══════════════════════════════════════════════════════════ -->
+     ═══════════════════════════════════════════════════════ -->
 <div id="app" role="application" aria-label="ALTAS Personal AI">
 
-  <!-- Mobile sidebar overlay/backdrop -->
-  <div
-    id="sidebar-overlay"
-    aria-hidden="true"
-    role="presentation"
-  ></div>
+  <!-- Mobile sidebar backdrop -->
+  <div id="sidebar-overlay" aria-hidden="true" role="presentation"></div>
 
-  <!-- ══════════════════════════════════════════════════════════
+  <!-- ════════════════════════════════════════
        SIDEBAR
-       ══════════════════════════════════════════════════════════ -->
-  <aside
-    id="sidebar"
-    aria-label="Navigation and conversation history"
-    data-state="open"
-  >
+       ════════════════════════════════════════ -->
+  <aside id="sidebar" aria-label="Navigation and conversation history" data-state="open">
 
-    <!-- ── Sidebar: Logo / brand ── -->
+    <!-- Logo -->
     <div class="sidebar-header" role="banner">
       <div class="logo-mark" aria-hidden="true">
-        <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <polygon points="18,2 32,10 32,26 18,34 4,26 4,10"
-            fill="none" stroke="rgba(123,108,255,0.45)" stroke-width="0.75"/>
-          <polygon points="18,7 27,12 27,24 18,29 9,24 9,12"
-            fill="rgba(123,108,255,0.07)" stroke="rgba(123,108,255,0.28)" stroke-width="0.75"/>
+        <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+          <polygon points="18,2 32,10 32,26 18,34 4,26 4,10" fill="none" stroke="rgba(123,108,255,0.45)" stroke-width="0.75"/>
+          <polygon points="18,7 27,12 27,24 18,29 9,24 9,12" fill="rgba(123,108,255,0.07)" stroke="rgba(123,108,255,0.28)" stroke-width="0.75"/>
           <circle cx="18" cy="18" r="4.5" fill="#7B6CFF" opacity="0.95"/>
           <circle cx="18" cy="18" r="2.5" fill="#C4BFFF"/>
           <circle cx="18" cy="2"  r="1.2" fill="rgba(155,143,255,0.65)"/>
@@ -153,195 +122,180 @@
           <span>Tactical</span>
         </div>
       </div>
-
-      <!-- Collapse sidebar button (desktop) -->
-      <button
-        class="sidebar-collapse-btn"
-        id="btn-sidebar-collapse"
-        aria-label="Collapse sidebar"
-        title="Collapse sidebar"
-      >
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
-          stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+      <button class="sidebar-collapse-btn" id="btn-sidebar-collapse" aria-label="Collapse sidebar">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
           <path d="M9 2L4 7l5 5"/>
         </svg>
       </button>
     </div>
 
-    <!-- ── Sidebar: New chat CTA ── -->
+    <!-- New chat -->
     <div class="sidebar-new-chat-wrap">
-      <button
-        class="btn-new-chat"
-        id="btn-new-chat"
-        aria-label="Start a new conversation"
-        data-shortcut="⌘ K"
-      >
+      <button class="btn-new-chat" id="btn-new-chat" aria-label="Start a new conversation" data-shortcut="⌘K">
         <span class="btn-new-chat-icon" aria-hidden="true">
-          <!-- Plus icon -->
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
-            stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
             <line x1="7" y1="2" x2="7" y2="12"/>
             <line x1="2" y1="7" x2="12" y2="7"/>
           </svg>
         </span>
         <span class="btn-new-chat-label">New conversation</span>
-        <span class="btn-new-chat-shortcut" aria-hidden="true">⌘ K</span>
+        <span class="btn-new-chat-shortcut" aria-hidden="true">⌘K</span>
       </button>
     </div>
 
-    <!-- ── Sidebar: Nav tabs — Chats / Projects / Memory ── -->
+    <!-- Nav tabs: Chats · Projects · Memory -->
     <div class="sidebar-nav-tabs" role="tablist" aria-label="Sidebar navigation">
-      <button class="sidebar-nav-tab active" data-tab="chats"
-        role="tab" aria-selected="true" aria-controls="panel-chats">
-        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"
-          stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M1 2.5a1.5 1.5 0 011.5-1.5h7A1.5 1.5 0 0111 2.5v5A1.5 1.5 0 019.5 9H7l-3 2V9H2.5A1.5 1.5 0 011 7.5v-5z"/>
+      <button class="sidebar-nav-tab active" data-tab="chats" role="tab" aria-selected="true" aria-controls="panel-chats">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M1 2.5A1.5 1.5 0 012.5 1h7A1.5 1.5 0 0111 2.5v5A1.5 1.5 0 019.5 9H7l-3 2V9H2.5A1.5 1.5 0 011 7.5v-5z"/>
         </svg>
         Chats
       </button>
-      <button class="sidebar-nav-tab" data-tab="projects"
-        role="tab" aria-selected="false" aria-controls="panel-projects">
-        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"
-          stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+      <button class="sidebar-nav-tab" data-tab="projects" role="tab" aria-selected="false" aria-controls="panel-projects">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
           <rect x="1" y="3" width="10" height="8" rx="1.5"/>
           <path d="M1 6h10M4 3V1.5M8 3V1.5"/>
         </svg>
         Projects
       </button>
-      <button class="sidebar-nav-tab" data-tab="memory"
-        role="tab" aria-selected="false" aria-controls="panel-memory">
-        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"
-          stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+      <button class="sidebar-nav-tab" data-tab="memory" role="tab" aria-selected="false" aria-controls="panel-memory">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
           <rect x="1" y="3" width="10" height="6" rx="1.5"/>
           <circle cx="3.5" cy="6" r="0.8" fill="currentColor" stroke="none"/>
-          <circle cx="6" cy="6" r="0.8" fill="currentColor" stroke="none"/>
+          <circle cx="6"   cy="6" r="0.8" fill="currentColor" stroke="none"/>
           <circle cx="8.5" cy="6" r="0.8" fill="currentColor" stroke="none"/>
         </svg>
         Memory
       </button>
     </div>
 
-    <!-- ══════════════════════════════════
-         PANEL: CHATS
-         ══════════════════════════════════ -->
+    <!-- ── PANEL: CHATS ── -->
     <div class="sidebar-panel active" id="panel-chats" role="tabpanel" aria-label="Chats">
-
-      <!-- Search conversations -->
       <div class="sidebar-search-wrap">
         <div class="sidebar-search" role="search">
           <span class="sidebar-search-icon" aria-hidden="true">
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"
-              stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
               <circle cx="5" cy="5" r="3.5"/>
               <line x1="7.5" y1="7.5" x2="11" y2="11"/>
             </svg>
           </span>
-          <input
-            type="search"
-            id="conv-search"
-            class="sidebar-search-input"
-            placeholder="Search conversations…"
-            aria-label="Search conversations"
-            autocomplete="off"
-            spellcheck="false"
-          />
+          <input type="search" id="conv-search" class="sidebar-search-input"
+            placeholder="Search conversations…" aria-label="Search conversations"
+            autocomplete="off" spellcheck="false" />
         </div>
       </div>
 
-      <!-- Today's chats -->
       <div class="conv-group" id="conv-group-today">
-        <div class="sidebar-section-label" id="label-today">Today</div>
-        <nav
-          class="conversation-list"
-          id="conversation-list-today"
-          aria-label="Today's conversations"
-          role="list"
-        >
-          <div class="conv-empty" id="conv-empty-today" aria-live="polite">
-            <span>No conversations yet</span>
-          </div>
+        <div class="sidebar-section-label">Today</div>
+        <nav class="conversation-list" id="conversation-list-today" aria-label="Today's conversations" role="list">
+          <div class="conv-empty" id="conv-empty-today" aria-live="polite"><span>No conversations yet</span></div>
         </nav>
       </div>
 
-      <!-- Earlier chats -->
       <div class="conv-group" id="conv-group-earlier" style="display:none;">
         <div class="sidebar-section-label">Earlier</div>
-        <nav
-          class="conversation-list"
-          id="conversation-list-earlier"
-          aria-label="Earlier conversations"
-          role="list"
-        >
-        </nav>
+        <nav class="conversation-list" id="conversation-list-earlier" aria-label="Earlier conversations" role="list"></nav>
       </div>
-
     </div>
-    <!-- /panel-chats -->
 
-    <!-- ══════════════════════════════════
-         PANEL: PROJECTS
-         ══════════════════════════════════ -->
+    <!-- ── PANEL: PROJECTS ── -->
     <div class="sidebar-panel" id="panel-projects" role="tabpanel" aria-label="Projects">
-
       <div class="projects-panel-header">
         <span class="projects-panel-title">Projects</span>
         <button class="btn-new-project" id="btn-new-project" aria-label="Create new project">
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"
-            stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
             <line x1="6" y1="2" x2="6" y2="10"/>
             <line x1="2" y1="6" x2="10" y2="6"/>
           </svg>
         </button>
       </div>
-
-      <div class="project-list" id="project-list" role="list" aria-label="Your projects">
-        <!-- Populated by projects.js -->
-      </div>
-
+      <div class="project-list" id="project-list" role="list" aria-label="Your projects"></div>
     </div>
-    <!-- /panel-projects -->
 
-    <!-- ══════════════════════════════════
-         PANEL: MEMORY (stub — Phase 12)
-         ══════════════════════════════════ -->
+    <!-- ── PANEL: MEMORY ── -->
     <div class="sidebar-panel" id="panel-memory" role="tabpanel" aria-label="Memory">
-      <div style="padding: var(--sp-8) var(--sp-4); text-align:center; color: var(--text-500);">
-        <div style="font-family: var(--font-title); font-size: 11px; letter-spacing: 0.1em; margin-bottom: var(--sp-2);">MEMORY</div>
-        <div style="font-size: 12px; color: var(--text-500);">Coming in Phase 12</div>
+      <div class="memory-panel-header">
+        <span class="memory-panel-title">Memory</span>
+        <div class="memory-panel-actions">
+          <button class="memory-panel-btn" id="memory-add-btn" aria-label="Add memory entry">
+            <svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+              <line x1="5.5" y1="1" x2="5.5" y2="10"/>
+              <line x1="1"   y1="5.5" x2="10" y2="5.5"/>
+            </svg>
+          </button>
+          <button class="memory-panel-btn" id="memory-export-btn" aria-label="Export memories">
+            <svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5.5 1v6M3 4.5l2.5 2.5 2.5-2.5"/>
+              <path d="M1 9h9"/>
+            </svg>
+          </button>
+          <button class="memory-panel-btn" id="memory-import-btn" aria-label="Import memories">
+            <svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5.5 7V1M3 3.5L5.5 1 8 3.5"/>
+              <path d="M1 9h9"/>
+            </svg>
+          </button>
+          <input type="file" id="memory-import-input" accept=".json" style="display:none;" aria-hidden="true"/>
+        </div>
+      </div>
+
+      <div class="memory-search-wrap">
+        <div class="memory-search">
+          <span class="memory-search-icon" aria-hidden="true">
+            <svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+              <circle cx="4.5" cy="4.5" r="3.2"/>
+              <line x1="7" y1="7" x2="10" y2="10"/>
+            </svg>
+          </span>
+          <input type="search" id="memory-search-input" class="memory-search-input"
+            placeholder="Search memories…" aria-label="Search memories" autocomplete="off" />
+          <button class="memory-search-clear" id="memory-search-clear" aria-label="Clear search">
+            <svg width="8" height="8" viewBox="0 0 8 8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+              <line x1="1" y1="1" x2="7" y2="7"/>
+              <line x1="7" y1="1" x2="1" y2="7"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="memory-tag-filter" id="memory-tag-filter" aria-label="Filter by tag"></div>
+
+      <div class="memory-list" id="memory-list" role="list" aria-label="Memory entries"
+        aria-live="polite"></div>
+
+      <div class="memory-io-bar">
+        <span class="memory-stats-count" id="memory-stats-count">0 entries</span>
+        <button class="memory-sort-btn" id="memory-sort-btn" title="Sort memories">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
+            <line x1="1" y1="3" x2="9" y2="3"/>
+            <line x1="2" y1="5" x2="8" y2="5"/>
+            <line x1="3" y1="7" x2="7" y2="7"/>
+          </svg>
+          Sort
+        </button>
+        <span class="memory-total-badge" id="memory-total-badge">0 entries</span>
       </div>
     </div>
-    <!-- /panel-memory -->
 
-    <!-- ── Sidebar: Spacer ── -->
+    <!-- Sidebar spacer -->
     <div class="sidebar-spacer" aria-hidden="true"></div>
 
-    <!-- ── Sidebar: Capabilities quick-links ── -->
+    <!-- Capabilities grid -->
     <div class="sidebar-capabilities">
       <div class="sidebar-section-label">Capabilities</div>
       <div class="capability-grid" role="list">
-
-        <button class="capability-item" role="listitem"
-          data-action="capability" data-cap="memory"
-          aria-label="Memory Bank — coming soon" disabled>
+        <button class="capability-item" role="listitem" data-cursor="blocked" disabled aria-label="Memory Bank — active">
           <span class="capability-icon" aria-hidden="true">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
-              stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
               <rect x="1" y="3" width="12" height="8" rx="1.5"/>
-              <circle cx="4" cy="7" r="1"/>
-              <circle cx="7" cy="7" r="1"/>
-              <circle cx="10" cy="7" r="1"/>
+              <circle cx="4" cy="7" r="1"/><circle cx="7" cy="7" r="1"/><circle cx="10" cy="7" r="1"/>
             </svg>
           </span>
           <span class="capability-label">Memory</span>
-          <span class="capability-badge">Soon</span>
         </button>
-
-        <button class="capability-item" role="listitem"
-          data-action="capability" data-cap="files"
-          aria-label="File upload — coming soon" disabled>
+        <button class="capability-item" role="listitem" data-cursor="blocked" disabled aria-label="File upload — coming soon">
           <span class="capability-icon" aria-hidden="true">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
-              stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
               <path d="M8 1H3a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V6L8 1z"/>
               <path d="M8 1v5h4"/>
             </svg>
@@ -349,13 +303,9 @@
           <span class="capability-label">Files</span>
           <span class="capability-badge">Soon</span>
         </button>
-
-        <button class="capability-item" role="listitem"
-          data-action="capability" data-cap="notion"
-          aria-label="Notion integration — coming soon" disabled>
+        <button class="capability-item" role="listitem" data-cursor="blocked" disabled aria-label="Notion — coming soon">
           <span class="capability-icon" aria-hidden="true">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
-              stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
               <rect x="1" y="1" width="12" height="12" rx="2"/>
               <line x1="4" y1="5" x2="10" y2="5"/>
               <line x1="4" y1="7.5" x2="8" y2="7.5"/>
@@ -365,493 +315,242 @@
           <span class="capability-label">Notion</span>
           <span class="capability-badge">Soon</span>
         </button>
-
-        <button class="capability-item" role="listitem"
-          data-action="capability" data-cap="web"
-          aria-label="Web search — coming soon" disabled>
+        <button class="capability-item" role="listitem" data-cursor="blocked" disabled aria-label="Web search — coming soon">
           <span class="capability-icon" aria-hidden="true">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
-              stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="7" cy="7" r="5.5"/>
-              <path d="M7 1.5C7 1.5 5 4 5 7s2 5.5 2 5.5"/>
-              <path d="M7 1.5C7 1.5 9 4 9 7s-2 5.5-2 5.5"/>
+              <path d="M7 1.5C7 1.5 5 4 5 7s2 5.5 2 5.5M7 1.5C7 1.5 9 4 9 7s-2 5.5-2 5.5"/>
               <line x1="1.5" y1="7" x2="12.5" y2="7"/>
             </svg>
           </span>
           <span class="capability-label">Web</span>
           <span class="capability-badge">Soon</span>
         </button>
-
       </div>
     </div>
 
-    <!-- ── Sidebar: Footer / status ── -->
+    <!-- Footer -->
     <footer class="sidebar-footer" aria-label="System status">
-
       <div class="sidebar-footer-row">
         <div class="status-indicator" id="status-indicator" role="status" aria-live="polite">
           <div class="status-dot" id="status-dot"></div>
           <span class="status-text" id="status-text">Connecting…</span>
         </div>
-        <button class="icon-btn" id="btn-settings"
-          aria-label="Settings" title="Settings">
-          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"
-            stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+        <button class="icon-btn" id="btn-settings" aria-label="Open settings" title="Settings" data-cursor="link">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="6.5" cy="6.5" r="2"/>
-            <path d="M6.5 1v1.5M6.5 10.5V12M12 6.5h-1.5M2.5 6.5H1
-                     M10.3 2.7l-1.1 1.1M3.8 9.2l-1.1 1.1
-                     M10.3 10.3l-1.1-1.1M3.8 3.8L2.7 2.7"/>
+            <path d="M6.5 1v1.5M6.5 10.5V12M12 6.5h-1.5M2.5 6.5H1M10.3 2.7l-1.1 1.1M3.8 9.2l-1.1 1.1M10.3 10.3l-1.1-1.1M3.8 3.8L2.7 2.7"/>
           </svg>
         </button>
       </div>
-
-      <div class="model-badge" aria-label="AI model in use">
+      <div class="model-badge" aria-label="Active model">
         <div class="model-badge-dot" aria-hidden="true"></div>
         <span>claude-haiku-4-5</span>
         <span class="model-badge-tier">· haiku</span>
       </div>
-
-      <div class="sidebar-version" aria-label="Version">
+      <div class="sidebar-version">
         <span class="t-mono dimmed">ALTAS v1.0.0</span>
         <span class="sidebar-version-sep" aria-hidden="true">·</span>
         <span class="t-mono dimmed" id="session-count">0 messages</span>
       </div>
-
     </footer>
 
   </aside>
+  <!-- /sidebar -->
 
 
-  <!-- ══════════════════════════════════════════════════════════
+  <!-- ════════════════════════════════════════
        MAIN PANEL
-       ══════════════════════════════════════════════════════════ -->
+       ════════════════════════════════════════ -->
   <main id="main" aria-label="Conversation area">
 
-    <!-- ── Header ── -->
+    <!-- Header -->
     <header id="header" aria-label="Conversation header">
-
       <div class="header-left">
-        <!-- Mobile: toggle sidebar -->
-        <button
-          class="sidebar-toggle"
-          id="sidebar-toggle"
-          aria-label="Toggle navigation sidebar"
-          aria-expanded="false"
-          aria-controls="sidebar"
-        >
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"
-            stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+        <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle sidebar" aria-expanded="false" aria-controls="sidebar">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
             <line x1="2" y1="5"  x2="16" y2="5"/>
             <line x1="2" y1="9"  x2="16" y2="9"/>
             <line x1="2" y1="13" x2="16" y2="13"/>
           </svg>
         </button>
-
-        <!-- Breadcrumb / title -->
         <div class="header-breadcrumb" aria-label="Current conversation">
           <span class="header-breadcrumb-root muted">ALTAS</span>
           <span class="header-breadcrumb-sep muted" aria-hidden="true">
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"
-              stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
               <path d="M3 2l4 3-4 3"/>
             </svg>
           </span>
-          <span
-            class="header-title-text"
-            id="header-chat-title"
-            aria-live="polite"
-            aria-label="Conversation title"
-          >New conversation</span>
+          <span class="header-title-text" id="header-chat-title" aria-live="polite">New conversation</span>
+        </div>
+        <!-- Active project indicator -->
+        <div id="active-project-indicator" aria-label="Active project" role="status">
+          <div class="active-project-dot" id="active-project-dot"></div>
+          <span class="active-project-name" id="active-project-name"></span>
         </div>
       </div>
 
       <div class="header-center" aria-hidden="true">
-        <!-- Token / context indicator -->
-        <div class="context-meter" id="context-meter" title="Context usage">
+        <div class="context-meter" id="context-meter" title="Context token usage">
           <div class="context-meter-bar">
-            <div class="context-meter-fill" id="context-fill" style="width: 0%"></div>
+            <div class="context-meter-fill" id="context-fill" style="width:0%"></div>
           </div>
           <span class="context-meter-label" id="context-label">0 tokens</span>
         </div>
       </div>
 
       <div class="header-right">
-        <!-- Thinking toggle -->
-        <div class="header-toggle-group" role="group" aria-label="Mode toggles">
-          <button
-            class="header-mode-btn"
-            id="btn-mode-precise"
-            data-mode="precise"
-            aria-label="Precise mode"
-            title="Precise — lower temperature"
-            aria-pressed="false"
-          >
-            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"
-              stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
+        <div class="header-toggle-group" role="group" aria-label="Response mode">
+          <button class="header-mode-btn" id="btn-mode-precise" data-mode="precise" aria-label="Precise mode" aria-pressed="false">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
               <circle cx="6.5" cy="6.5" r="5"/>
               <line x1="6.5" y1="3" x2="6.5" y2="6.5"/>
               <circle cx="6.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/>
             </svg>
             Precise
           </button>
-          <button
-            class="header-mode-btn active"
-            id="btn-mode-balanced"
-            data-mode="balanced"
-            aria-label="Balanced mode"
-            title="Balanced — default"
-            aria-pressed="true"
-          >
+          <button class="header-mode-btn active" id="btn-mode-balanced" data-mode="balanced" aria-label="Balanced mode" aria-pressed="true">
             Balanced
           </button>
-          <button
-            class="header-mode-btn"
-            id="btn-mode-creative"
-            data-mode="creative"
-            aria-label="Creative mode"
-            title="Creative — higher temperature"
-            aria-pressed="false"
-          >
-            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"
-              stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+          <button class="header-mode-btn" id="btn-mode-creative" data-mode="creative" aria-label="Creative mode" aria-pressed="false">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
               <path d="M6.5 1C6.5 1 4 3.5 4 6a2.5 2.5 0 005 0C9 3.5 6.5 1 6.5 1z"/>
               <line x1="6.5" y1="8.5" x2="6.5" y2="12"/>
             </svg>
             Creative
           </button>
         </div>
-
         <div class="header-divider" aria-hidden="true"></div>
-
-        <!-- Export -->
-        <button
-          class="header-btn"
-          id="btn-export"
-          aria-label="Export conversation as markdown"
-          title="Export conversation"
-        >
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
-            stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M7 1v8M4 6l3 3 3-3"/>
-            <path d="M2 11h10"/>
+        <button class="header-btn" id="btn-export" aria-label="Export conversation" title="Export">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 1v8M4 6l3 3 3-3"/><path d="M2 11h10"/>
           </svg>
         </button>
-
-        <!-- Clear chat -->
-        <button
-          class="header-btn"
-          id="btn-clear"
-          aria-label="Clear current conversation"
-          title="Clear conversation"
-        >
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
-            stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+        <button class="header-btn" id="btn-clear" aria-label="Clear conversation" title="Clear">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
             <path d="M2 3h10M5 3V2h4v1M11 3l-.8 9H3.8L3 3"/>
             <line x1="5.5" y1="6" x2="5.5" y2="10"/>
             <line x1="8.5" y1="6" x2="8.5" y2="10"/>
           </svg>
         </button>
-
       </div>
     </header>
 
-
-    <!-- ── Chat scroll area ── -->
-    <div
-      id="chat-area"
-      role="log"
-      aria-live="polite"
-      aria-atomic="false"
-      aria-label="Conversation messages"
-      tabindex="0"
-    >
+    <!-- Chat area -->
+    <div id="chat-area" role="log" aria-live="polite" aria-atomic="false" aria-label="Conversation messages" tabindex="0">
       <div class="chat-inner" id="chat-inner">
 
-        <!-- ──────────────────────────────────────────────────
-             WELCOME SCREEN
-             Shown when no messages exist
-             ────────────────────────────────────────────────── -->
-        <section id="welcome" aria-label="Welcome to ALTAS" aria-hidden="false">
-
-          <!-- Animated orb -->
+        <!-- Welcome screen -->
+        <section id="welcome" aria-label="Welcome to ALTAS">
           <div class="welcome-orb-wrap" aria-hidden="true">
-            <div class="welcome-orb-orbit welcome-orb-orbit--outer">
-              <div class="welcome-orb-orbit-dot"></div>
-            </div>
-            <div class="welcome-orb-orbit welcome-orb-orbit--mid">
-              <div class="welcome-orb-orbit-dot"></div>
-            </div>
+            <div class="welcome-orb-orbit welcome-orb-orbit--outer"><div class="welcome-orb-orbit-dot"></div></div>
+            <div class="welcome-orb-orbit welcome-orb-orbit--mid"><div class="welcome-orb-orbit-dot"></div></div>
             <div class="welcome-orb-core">
               <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-                <polygon points="14,2 25,8 25,20 14,26 3,20 3,8"
-                  fill="none" stroke="rgba(123,108,255,0.55)" stroke-width="0.75"/>
+                <polygon points="14,2 25,8 25,20 14,26 3,20 3,8" fill="none" stroke="rgba(123,108,255,0.55)" stroke-width="0.75"/>
                 <circle cx="14" cy="14" r="5" fill="#7B6CFF" opacity="0.9"/>
                 <circle cx="14" cy="14" r="2.8" fill="#C4BFFF"/>
               </svg>
             </div>
           </div>
 
-          <!-- Greeting text -->
           <div class="welcome-text-block">
-            <p class="welcome-eyebrow t-mono muted">
-              System online · All systems nominal
-            </p>
-            <h1 class="welcome-title">
-              Hello. I'm <em>ALTAS</em>
-            </h1>
-            <p class="welcome-subtitle">
-              Adaptive · Logical · Tactical · Autonomous · Sentinel
-            </p>
-            <p class="welcome-body muted">
-              Your personal intelligence system. Ask me anything —
-              I reason deeply, respond precisely, and adapt to how you think.
-            </p>
+            <p class="welcome-eyebrow t-mono muted">System online · All systems nominal</p>
+            <h1 class="welcome-title">Hello. I'm <em>ALTAS</em></h1>
+            <p class="welcome-subtitle">Adaptive · Logical · Tactical · Autonomous · Sentinel</p>
+            <p class="welcome-body muted">Your personal intelligence system. Ask me anything — I reason deeply, respond precisely, and adapt to how you think.</p>
           </div>
 
-          <!-- Capability pills -->
           <div class="welcome-pills" aria-label="What ALTAS can do" role="list">
-            <div class="welcome-pill" role="listitem">
-              <span class="welcome-pill-icon" aria-hidden="true">
-                <svg width="13" height="13" viewBox="0 0 13 13" fill="none"
-                  stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M6.5 1L8.5 5l4.5.5-3.3 3.1.8 4.4L6.5 11 2 13l.8-4.4L-.5 5.5 4 5z"/>
-                </svg>
-              </span>
-              Deep reasoning
-            </div>
-            <div class="welcome-pill" role="listitem">
-              <span class="welcome-pill-icon" aria-hidden="true">
-                <svg width="13" height="13" viewBox="0 0 13 13" fill="none"
-                  stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="1" y="3" width="11" height="7" rx="1.5"/>
-                  <line x1="4" y1="6.5" x2="9" y2="6.5"/>
-                  <line x1="6.5" y1="4" x2="6.5" y2="9"/>
-                </svg>
-              </span>
-              Structured output
-            </div>
-            <div class="welcome-pill" role="listitem">
-              <span class="welcome-pill-icon" aria-hidden="true">
-                <svg width="13" height="13" viewBox="0 0 13 13" fill="none"
-                  stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="6.5" cy="6.5" r="5"/>
-                  <path d="M6.5 3.5v3l2 2"/>
-                </svg>
-              </span>
-              Streaming answers
-            </div>
-            <div class="welcome-pill" role="listitem">
-              <span class="welcome-pill-icon" aria-hidden="true">
-                <svg width="13" height="13" viewBox="0 0 13 13" fill="none"
-                  stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M2 10l3-3 2 2 4-6"/>
-                </svg>
-              </span>
-              Code &amp; analysis
-            </div>
+            <div class="welcome-pill" role="listitem"><span class="welcome-pill-icon" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 1L8.5 5l4.5.5-3.3 3.1.8 4.4L6.5 11 2 13l.8-4.4L-.5 5.5 4 5z"/></svg></span>Deep reasoning</div>
+            <div class="welcome-pill" role="listitem"><span class="welcome-pill-icon" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="11" height="7" rx="1.5"/><line x1="4" y1="6.5" x2="9" y2="6.5"/><line x1="6.5" y1="4" x2="6.5" y2="9"/></svg></span>Structured output</div>
+            <div class="welcome-pill" role="listitem"><span class="welcome-pill-icon" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="6.5" cy="6.5" r="5"/><path d="M6.5 3.5v3l2 2"/></svg></span>Streaming answers</div>
+            <div class="welcome-pill" role="listitem"><span class="welcome-pill-icon" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M2 10l3-3 2 2 4-6"/></svg></span>Code &amp; analysis</div>
           </div>
 
-          <!-- Suggestion chips -->
-          <div class="welcome-chips-label t-xs muted" aria-hidden="true">
-            Try asking
-          </div>
-          <div
-            class="welcome-chips"
-            id="welcome-chips"
-            role="list"
-            aria-label="Suggested prompts"
-          >
-            <button
-              class="chip"
-              role="listitem"
-              data-prompt="What can you help me with? Give me a detailed breakdown of your capabilities."
-              aria-label="Suggested prompt: What can you do?"
-            >
-              <span class="chip-icon" aria-hidden="true">⬡</span>
-              What can you do?
+          <div class="welcome-chips-label t-xs muted" aria-hidden="true">Try asking</div>
+          <div class="welcome-chips" id="welcome-chips" role="list" aria-label="Suggested prompts">
+            <button class="chip" role="listitem" data-prompt="What can you help me with? Give me a detailed breakdown of your capabilities." data-cursor="link">
+              <span class="chip-icon" aria-hidden="true">⬡</span>What can you do?
             </button>
-
-            <button
-              class="chip"
-              role="listitem"
-              data-prompt="Explain how to build a second brain using Notion and an AI assistant like ALTAS. Give me a step-by-step system."
-              aria-label="Suggested prompt: Second brain setup"
-            >
-              <span class="chip-icon" aria-hidden="true">⬡</span>
-              Second brain setup
+            <button class="chip" role="listitem" data-prompt="Explain how to build a second brain using Notion and an AI assistant like ALTAS. Give me a step-by-step system." data-cursor="link">
+              <span class="chip-icon" aria-hidden="true">⬡</span>Second brain setup
             </button>
-
-            <button
-              class="chip"
-              role="listitem"
-              data-prompt="Design a productivity system for a university student that integrates note-taking, task management, and AI assistance."
-              aria-label="Suggested prompt: Productivity system"
-            >
-              <span class="chip-icon" aria-hidden="true">⬡</span>
-              Productivity system
+            <button class="chip" role="listitem" data-prompt="Design a productivity system for a university student that integrates note-taking, task management, and AI assistance." data-cursor="link">
+              <span class="chip-icon" aria-hidden="true">⬡</span>Productivity system
             </button>
-
-            <button
-              class="chip"
-              role="listitem"
-              data-prompt="Summarise the key ideas and frameworks from 'Building a Second Brain' by Tiago Forte. Include the CODE method and PARA system."
-              aria-label="Suggested prompt: Building a Second Brain summary"
-            >
-              <span class="chip-icon" aria-hidden="true">⬡</span>
-              Building a Second Brain
+            <button class="chip" role="listitem" data-prompt="Summarise the key ideas and frameworks from 'Building a Second Brain' by Tiago Forte. Include the CODE method and PARA system." data-cursor="link">
+              <span class="chip-icon" aria-hidden="true">⬡</span>Building a Second Brain
             </button>
-
-            <button
-              class="chip"
-              role="listitem"
-              data-prompt="What is the most effective way to learn a complex technical subject from scratch? Give me a structured learning roadmap."
-              aria-label="Suggested prompt: Learning strategy"
-            >
-              <span class="chip-icon" aria-hidden="true">⬡</span>
-              Learning strategy
+            <button class="chip" role="listitem" data-prompt="What is the most effective way to learn a complex technical subject from scratch? Give me a structured learning roadmap." data-cursor="link">
+              <span class="chip-icon" aria-hidden="true">⬡</span>Learning strategy
             </button>
-
-            <button
-              class="chip"
-              role="listitem"
-              data-prompt="Write a Python function that implements binary search with full type annotations, docstring, and unit tests."
-              aria-label="Suggested prompt: Python coding"
-            >
-              <span class="chip-icon" aria-hidden="true">⬡</span>
-              Python + unit tests
+            <button class="chip" role="listitem" data-prompt="Write a Python function that implements binary search with full type annotations, docstring, and unit tests." data-cursor="link">
+              <span class="chip-icon" aria-hidden="true">⬡</span>Python + unit tests
             </button>
           </div>
 
-          <!-- Keyboard shortcut hint -->
           <div class="welcome-shortcut-hint t-mono muted" aria-hidden="true">
-            <kbd>↵</kbd> to send &nbsp;·&nbsp;
-            <kbd>⌘K</kbd> new chat &nbsp;·&nbsp;
-            <kbd>⌘⇧C</kbd> copy last
+            <kbd>↵</kbd> send &nbsp;·&nbsp; <kbd>⌘K</kbd> new chat &nbsp;·&nbsp; <kbd>⌘/</kbd> shortcuts
           </div>
-
         </section>
-        <!-- /welcome -->
-
-        <!-- Messages are injected here by chat.js -->
+        <!-- /welcome — messages injected below by chat.js -->
 
       </div>
-      <!-- /chat-inner -->
     </div>
-    <!-- /chat-area -->
 
-
-    <!-- ── Input zone ── -->
-    <div id="input-zone" role="complementary" aria-label="Message input area">
+    <!-- Input zone -->
+    <div id="input-zone" role="complementary" aria-label="Message input">
       <div class="input-zone-inner">
 
-        <!-- Attachment preview strip (hidden until file attached) -->
-        <div
-          class="attachment-strip"
-          id="attachment-strip"
-          aria-live="polite"
-          aria-label="Attached files"
-          hidden
-        >
-          <!-- Populated by ui.js when files attached -->
-        </div>
+        <!-- Attachment strip -->
+        <div class="attachment-strip" id="attachment-strip" aria-live="polite" aria-label="Attached files" hidden></div>
 
-        <!-- ── Slash command dropdown — floats above input shell ── -->
-        <div
-          id="slash-dropdown"
-          role="listbox"
-          aria-label="Available slash commands"
-          aria-hidden="true"
-        >
+        <!-- Slash command dropdown -->
+        <div id="slash-dropdown" role="listbox" aria-label="Slash commands" aria-hidden="true">
           <div class="slash-dropdown-header">
             <span class="slash-dropdown-title">Commands</span>
             <span class="slash-dropdown-hint">↑↓ navigate · ↵ select · Esc close</span>
           </div>
-
-          <div class="slash-command-list" id="slash-command-list" role="presentation">
-            <!-- Populated by slash.js -->
-          </div>
-
+          <div class="slash-command-list" id="slash-command-list" role="presentation"></div>
           <div class="slash-dropdown-footer" aria-hidden="true">
-            <span class="slash-dropdown-key-hint">
-              <kbd class="kbd">↑</kbd><kbd class="kbd">↓</kbd> navigate
-            </span>
-            <span class="slash-dropdown-key-hint">
-              <kbd class="kbd">↵</kbd> select
-            </span>
-            <span class="slash-dropdown-key-hint">
-              <kbd class="kbd">Esc</kbd> close
-            </span>
+            <span class="slash-dropdown-key-hint"><kbd class="kbd">↑</kbd><kbd class="kbd">↓</kbd> navigate</span>
+            <span class="slash-dropdown-key-hint"><kbd class="kbd">↵</kbd> select</span>
+            <span class="slash-dropdown-key-hint"><kbd class="kbd">Esc</kbd> close</span>
           </div>
         </div>
 
-        <!-- Main input shell -->
+        <!-- Input shell -->
         <div class="input-shell" id="input-shell" role="form" aria-label="Compose message">
-
-          <!-- Left: attach / tools buttons -->
           <div class="input-left-actions" aria-label="Input tools">
-            <button
-              class="input-action-btn"
-              id="btn-attach"
-              aria-label="Attach file (coming soon)"
-              title="Attach file — coming soon"
-              disabled
-            >
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
-                stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+            <button class="input-action-btn" id="btn-attach" aria-label="Attach file (coming soon)" title="Coming soon" disabled data-cursor="blocked">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M14 8.5l-6 6a4 4 0 01-5.7-5.6L8.5 2.8a2.5 2.5 0 013.5 3.5L5.8 12.4a1 1 0 01-1.4-1.4l6.2-6.2"/>
               </svg>
             </button>
           </div>
-
-          <!-- Centre: textarea -->
-          <textarea
-            id="prompt-input"
-            name="prompt"
-            placeholder="Ask ALTAS anything…"
-            rows="1"
-            aria-label="Type your message"
-            aria-required="true"
-            aria-multiline="true"
-            autocomplete="off"
-            autocorrect="on"
-            autocapitalize="sentences"
-            spellcheck="true"
-            maxlength="32000"
-          ></textarea>
-
-          <!-- Right: send button -->
-          <button
-            class="btn-send"
-            id="btn-send"
-            aria-label="Send message"
-            aria-disabled="true"
-            disabled
-            type="button"
-          >
-            <!-- Arrow right icon (idle) -->
+          <textarea id="prompt-input" name="prompt" placeholder="Ask ALTAS anything…" rows="1"
+            aria-label="Type your message" aria-required="true" autocomplete="off"
+            autocorrect="on" autocapitalize="sentences" spellcheck="true"
+            maxlength="32000" data-cursor="text"></textarea>
+          <button class="btn-send" id="btn-send" aria-label="Send message" aria-disabled="true" disabled type="button" data-cursor="link">
             <span class="btn-send-icon btn-send-icon--send" aria-hidden="true">
-              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"
-                stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M15 9H3M9.5 3.5L15 9l-5.5 5.5"/>
               </svg>
             </span>
-            <!-- Stop icon (streaming) -->
             <span class="btn-send-icon btn-send-icon--stop" aria-hidden="true" style="display:none;">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                 <rect x="4" y="4" width="8" height="8" rx="1.5"/>
               </svg>
             </span>
           </button>
-
         </div>
-        <!-- /input-shell -->
 
-        <!-- Input meta bar -->
         <div class="input-meta" aria-hidden="true">
           <div class="input-meta-left">
             <span class="input-hint" id="input-hint">
-              <kbd class="kbd">↵</kbd> send &nbsp;
-              <kbd class="kbd">⇧↵</kbd> newline
+              <kbd class="kbd">↵</kbd> send &nbsp;<kbd class="kbd">⇧↵</kbd> newline
             </span>
           </div>
           <div class="input-meta-right">
@@ -861,15 +560,10 @@
           </div>
         </div>
 
-        <!-- Disclaimer -->
-        <p class="input-disclaimer t-mono muted" aria-label="Disclaimer">
-          ALTAS may make mistakes. Verify important information.
-        </p>
+        <p class="input-disclaimer t-mono muted">ALTAS may make mistakes. Verify important information.</p>
 
       </div>
-      <!-- /input-zone-inner -->
     </div>
-    <!-- /input-zone -->
 
   </main>
   <!-- /main -->
@@ -878,183 +572,660 @@
 <!-- /app -->
 
 
-<!-- ═══════════════════════════════════════════════════════════
-     TOAST NOTIFICATION CONTAINER
-     ═══════════════════════════════════════════════════════════ -->
-<div
-  id="toast-container"
-  role="alert"
-  aria-live="assertive"
-  aria-atomic="true"
-  aria-label="Notifications"
-></div>
+<!-- ═══════════════════════════════════════════════════════
+     MODALS & OVERLAYS
+     ═══════════════════════════════════════════════════════ -->
 
+<!-- Toast notifications -->
+<div id="toast-container" role="alert" aria-live="assertive" aria-atomic="true" aria-label="Notifications"></div>
 
-<!-- ═══════════════════════════════════════════════════════════
-     KEYBOARD SHORTCUT OVERLAY (⌘ /)
-     ═══════════════════════════════════════════════════════════ -->
-<div
-  id="shortcuts-overlay"
-  class="overlay"
-  role="dialog"
-  aria-modal="true"
-  aria-label="Keyboard shortcuts"
-  hidden
->
+<!-- Keyboard shortcuts overlay -->
+<div id="shortcuts-overlay" class="overlay" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts" hidden>
   <div class="overlay-backdrop" id="shortcuts-backdrop"></div>
   <div class="overlay-panel">
     <div class="overlay-header">
       <h2 class="overlay-title">Keyboard shortcuts</h2>
       <button class="overlay-close" id="shortcuts-close" aria-label="Close shortcuts">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
-          stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-          <line x1="2" y1="2" x2="12" y2="12"/>
-          <line x1="12" y1="2" x2="2" y2="12"/>
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <line x1="2" y1="2" x2="12" y2="12"/><line x1="12" y1="2" x2="2" y2="12"/>
         </svg>
       </button>
     </div>
     <div class="overlay-body">
       <div class="shortcut-grid">
-        <div class="shortcut-item">
-          <span class="shortcut-label">New conversation</span>
-          <span class="shortcut-keys"><kbd>⌘</kbd><kbd>K</kbd></span>
-        </div>
-        <div class="shortcut-item">
-          <span class="shortcut-label">Send message</span>
-          <span class="shortcut-keys"><kbd>↵</kbd></span>
-        </div>
-        <div class="shortcut-item">
-          <span class="shortcut-label">New line</span>
-          <span class="shortcut-keys"><kbd>⇧</kbd><kbd>↵</kbd></span>
-        </div>
-        <div class="shortcut-item">
-          <span class="shortcut-label">Copy last response</span>
-          <span class="shortcut-keys"><kbd>⌘</kbd><kbd>⇧</kbd><kbd>C</kbd></span>
-        </div>
-        <div class="shortcut-item">
-          <span class="shortcut-label">Clear conversation</span>
-          <span class="shortcut-keys"><kbd>⌘</kbd><kbd>⇧</kbd><kbd>X</kbd></span>
-        </div>
-        <div class="shortcut-item">
-          <span class="shortcut-label">Focus input</span>
-          <span class="shortcut-keys"><kbd>⌘</kbd><kbd>L</kbd></span>
-        </div>
-        <div class="shortcut-item">
-          <span class="shortcut-label">Show shortcuts</span>
-          <span class="shortcut-keys"><kbd>⌘</kbd><kbd>/</kbd></span>
-        </div>
+        <div class="shortcut-item"><span class="shortcut-label">New conversation</span><span class="shortcut-keys"><kbd>⌘</kbd><kbd>K</kbd></span></div>
+        <div class="shortcut-item"><span class="shortcut-label">Send message</span><span class="shortcut-keys"><kbd>↵</kbd></span></div>
+        <div class="shortcut-item"><span class="shortcut-label">New line</span><span class="shortcut-keys"><kbd>⇧</kbd><kbd>↵</kbd></span></div>
+        <div class="shortcut-item"><span class="shortcut-label">Copy last response</span><span class="shortcut-keys"><kbd>⌘</kbd><kbd>⇧</kbd><kbd>C</kbd></span></div>
+        <div class="shortcut-item"><span class="shortcut-label">Clear conversation</span><span class="shortcut-keys"><kbd>⌘</kbd><kbd>⇧</kbd><kbd>X</kbd></span></div>
+        <div class="shortcut-item"><span class="shortcut-label">Focus input</span><span class="shortcut-keys"><kbd>⌘</kbd><kbd>L</kbd></span></div>
+        <div class="shortcut-item"><span class="shortcut-label">Show shortcuts</span><span class="shortcut-keys"><kbd>⌘</kbd><kbd>/</kbd></span></div>
+        <div class="shortcut-item"><span class="shortcut-label">Open settings</span><span class="shortcut-keys"><kbd>⌘</kbd><kbd>,</kbd></span></div>
       </div>
     </div>
   </div>
 </div>
 
+<!-- Settings overlay (full panel) -->
+<div id="settings-overlay" role="dialog" aria-modal="true" aria-label="Settings" hidden>
+  <div class="settings-overlay-backdrop" id="settings-overlay-backdrop"></div>
+  <div class="settings-panel-shell">
 
-<!-- ═══════════════════════════════════════════════════════════
-     SETTINGS PANEL (slide-in from right)
-     ═══════════════════════════════════════════════════════════ -->
-<div
-  id="settings-panel"
-  class="settings-panel"
-  role="dialog"
-  aria-modal="true"
-  aria-label="Settings"
-  hidden
->
-  <div class="settings-backdrop" id="settings-backdrop"></div>
-  <div class="settings-drawer">
-    <div class="settings-header">
-      <h2 class="settings-title">Settings</h2>
-      <button class="overlay-close" id="settings-close" aria-label="Close settings">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
-          stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-          <line x1="2" y1="2" x2="12" y2="12"/>
-          <line x1="12" y1="2" x2="2" y2="12"/>
+    <!-- Settings nav -->
+    <nav class="settings-nav" aria-label="Settings sections">
+      <div class="settings-nav-header">
+        <div class="settings-nav-title">Settings</div>
+        <div class="settings-nav-subtitle">ALTAS v1.0.0</div>
+      </div>
+      <div class="settings-nav-list" role="tablist">
+        <button class="settings-nav-item active" data-section="general" role="tab" aria-selected="true" aria-controls="pane-general">
+          <div class="settings-nav-icon" aria-hidden="true">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="6.5" cy="6.5" r="2"/>
+              <path d="M6.5 1v1.5M6.5 10.5V12M12 6.5h-1.5M2.5 6.5H1M10.3 2.7l-1.1 1.1M3.8 9.2l-1.1 1.1M10.3 10.3l-1.1-1.1M3.8 3.8L2.7 2.7"/>
+            </svg>
+          </div>
+          <span class="settings-nav-label">General</span>
+        </button>
+        <button class="settings-nav-item" data-section="github" role="tab" aria-selected="false" aria-controls="pane-github">
+          <div class="settings-nav-icon" aria-hidden="true">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6.5 1C3.46 1 1 3.46 1 6.5c0 2.48 1.61 4.59 3.84 5.33.28.05.38-.12.38-.27v-.94c-1.56.34-1.89-.75-1.89-.75-.25-.65-.63-.82-.63-.82-.52-.35.04-.34.04-.34.56.04.86.58.86.58.5.86 1.32.61 1.64.47.05-.36.2-.61.36-.75-1.25-.14-2.56-.62-2.56-2.77 0-.61.22-1.11.58-1.5-.06-.14-.25-.71.06-1.49 0 0 .47-.15 1.55.58.45-.13.93-.19 1.41-.19.48 0 .96.06 1.41.19 1.08-.73 1.55-.58 1.55-.58.31.78.12 1.35.06 1.49.36.39.58.89.58 1.5 0 2.15-1.31 2.63-2.56 2.77.2.17.38.52.38 1.05v1.57c0 .15.1.33.39.27C9.89 11.09 11.5 8.98 11.5 6.5 11.5 3.46 9.04 1 6.5 1z"/>
+            </svg>
+          </div>
+          <span class="settings-nav-label">GitHub</span>
+        </button>
+        <button class="settings-nav-item" data-section="integrations" role="tab" aria-selected="false" aria-controls="pane-integrations">
+          <div class="settings-nav-icon" aria-hidden="true">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="1" y="1" width="4.5" height="4.5" rx="1"/>
+              <rect x="7.5" y="1" width="4.5" height="4.5" rx="1"/>
+              <rect x="1" y="7.5" width="4.5" height="4.5" rx="1"/>
+              <rect x="7.5" y="7.5" width="4.5" height="4.5" rx="1"/>
+            </svg>
+          </div>
+          <span class="settings-nav-label">Integrations</span>
+        </button>
+        <button class="settings-nav-item" data-section="appearance" role="tab" aria-selected="false" aria-controls="pane-appearance">
+          <div class="settings-nav-icon" aria-hidden="true">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="6.5" cy="6.5" r="5.5"/>
+              <path d="M6.5 1v11M1 6.5h11"/>
+            </svg>
+          </div>
+          <span class="settings-nav-label">Appearance</span>
+        </button>
+        <div class="settings-nav-sep" aria-hidden="true"></div>
+        <button class="settings-nav-item" data-section="danger" role="tab" aria-selected="false" aria-controls="pane-danger">
+          <div class="settings-nav-icon" aria-hidden="true">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6.5 1L12 11H1L6.5 1z"/>
+              <line x1="6.5" y1="5" x2="6.5" y2="8"/>
+              <circle cx="6.5" cy="9.5" r="0.5" fill="currentColor" stroke="none"/>
+            </svg>
+          </div>
+          <span class="settings-nav-label">Danger zone</span>
+        </button>
+        <button class="settings-nav-item" data-section="about" role="tab" aria-selected="false" aria-controls="pane-about">
+          <div class="settings-nav-icon" aria-hidden="true">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="6.5" cy="6.5" r="5.5"/>
+              <line x1="6.5" y1="6" x2="6.5" y2="9.5"/>
+              <circle cx="6.5" cy="4" r="0.6" fill="currentColor" stroke="none"/>
+            </svg>
+          </div>
+          <span class="settings-nav-label">About</span>
+        </button>
+      </div>
+      <div class="settings-nav-footer">
+        <div class="settings-nav-version">ALTAS v1.0.0 · Phase 1 MVP</div>
+        <button class="settings-close-btn" id="settings-close-btn" data-id-alias="settings-close" aria-label="Close settings">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <line x1="2" y1="2" x2="11" y2="11"/><line x1="11" y1="2" x2="2" y2="11"/>
+          </svg>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Settings content -->
+    <div class="settings-content">
+      <div class="settings-content-header">
+        <div>
+          <div class="settings-section-title" id="settings-content-title">General</div>
+          <div class="settings-section-subtitle" id="settings-content-subtitle">Backend, model, and behaviour settings</div>
+        </div>
+      </div>
+
+      <div class="settings-content-body">
+
+        <!-- ── PANE: GENERAL ── -->
+        <div class="settings-pane active" data-pane="general" id="pane-general" role="tabpanel">
+          <div class="settings-group">
+            <div class="settings-group-title">Backend</div>
+            <div class="settings-field">
+              <label class="settings-label" for="settings-backend-url">Railway URL</label>
+              <p class="settings-desc">Your deployed Flask backend. e.g. https://your-app.railway.app</p>
+              <input type="url" id="settings-backend-url" class="settings-input" placeholder="https://your-app.railway.app" autocomplete="off" spellcheck="false" data-cursor="text"/>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <div class="settings-group-title">Model</div>
+            <div class="settings-row">
+              <div class="settings-row-label">
+                <div class="settings-label">Claude model</div>
+                <p class="settings-desc">Which Anthropic model ALTAS uses to respond.</p>
+              </div>
+              <div class="settings-row-control">
+                <select id="settings-model" class="settings-select" aria-label="Select Claude model" data-cursor="link"></select>
+              </div>
+            </div>
+            <div class="settings-range-wrap">
+              <div class="settings-range-header">
+                <label class="settings-label" for="settings-temperature">Temperature</label>
+                <span class="settings-range-value" id="settings-temp-value">0.70</span>
+              </div>
+              <p class="settings-desc">Higher = more creative. Lower = more precise.</p>
+              <input type="range" id="settings-temperature" class="settings-range" min="0" max="1" step="0.05" value="0.7" aria-valuemin="0" aria-valuemax="1" aria-valuenow="0.7"/>
+              <div class="settings-range-labels" aria-hidden="true"><span>Precise</span><span>Balanced</span><span>Creative</span></div>
+            </div>
+            <div class="settings-range-wrap">
+              <div class="settings-range-header">
+                <label class="settings-label" for="settings-max-tokens">Max tokens</label>
+                <span class="settings-range-value" id="settings-tokens-value">1,024</span>
+              </div>
+              <p class="settings-desc">Maximum response length per message.</p>
+              <input type="range" id="settings-max-tokens" class="settings-range" min="256" max="4096" step="256" value="1024"/>
+            </div>
+            <div class="settings-row">
+              <div class="settings-row-label">
+                <div class="settings-label">Stream responses</div>
+                <p class="settings-desc">Show responses as they generate rather than all at once.</p>
+              </div>
+              <div class="settings-row-control">
+                <label class="settings-toggle" aria-label="Toggle streaming">
+                  <input type="checkbox" id="settings-stream" checked/>
+                  <div class="settings-toggle-track"><div class="settings-toggle-thumb"></div></div>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <div class="settings-group-title">Custom instructions</div>
+            <div class="settings-field">
+              <label class="settings-label" for="settings-system-prompt">System prompt</label>
+              <p class="settings-desc">How ALTAS should behave. Prepended to every conversation.</p>
+              <textarea id="settings-system-prompt" class="settings-textarea" rows="6"
+                placeholder="You are ALTAS, a personal AI assistant. Be concise, direct, and helpful…"
+                spellcheck="true" data-cursor="text"></textarea>
+            </div>
+          </div>
+
+          <div class="settings-btn-row">
+            <button class="settings-btn settings-btn-primary" id="settings-save-general">Save settings</button>
+          </div>
+        </div>
+
+        <!-- ── PANE: GITHUB ── -->
+        <div class="settings-pane" data-pane="github" id="pane-github" role="tabpanel">
+          <div class="settings-group">
+            <div class="settings-group-title">GitHub account</div>
+            <div class="integration-card" id="github-integration-card">
+              <div class="integration-card-header">
+                <div class="integration-icon">
+                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round">
+                    <path d="M9 1C4.58 1 1 4.58 1 9c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38v-1.34c-2.22.48-2.69-1.07-2.69-1.07-.36-.92-.88-1.17-.88-1.17-.72-.49.05-.48.05-.48.8.06 1.22.82 1.22.82.71 1.22 1.86.87 2.31.66.07-.51.28-.87.51-1.07-1.77-.2-3.63-.88-3.63-3.93 0-.87.31-1.58.82-2.13-.08-.2-.36-.01-.36-2.01 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82 0 2-.28 1.81-.36 2.01.51.55.82 1.26.82 2.13 0 3.06-1.86 3.73-3.64 3.93.29.25.54.73.54 1.48v2.19c0 .21.15.46.55.38C14.71 15.53 17 12.54 17 9c0-4.42-3.58-8-8-8z"/>
+                  </svg>
+                </div>
+                <div class="integration-info">
+                  <div class="integration-name">GitHub</div>
+                  <div class="integration-desc">Connect to read repos, issues, PRs and commits</div>
+                </div>
+                <div class="integration-status disconnected" id="settings-github-status">
+                  <div class="integration-status-dot"></div>Not connected
+                </div>
+              </div>
+              <div class="integration-card-body">
+                <div class="settings-field">
+                  <label class="settings-label" for="settings-github-token">Personal access token</label>
+                  <p class="settings-desc">Create one at github.com/settings/tokens — needs repo, read:user scopes</p>
+                  <div class="settings-input-wrap">
+                    <input type="password" id="settings-github-token" class="settings-input"
+                      placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off" spellcheck="false" data-cursor="text"/>
+                    <button class="settings-input-toggle" id="github-token-toggle" aria-label="Toggle token visibility" type="button">
+                      <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M1 6.5S3 3 6.5 3 12 6.5 12 6.5 10 10 6.5 10 1 6.5 1 6.5z"/>
+                        <circle cx="6.5" cy="6.5" r="1.5"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+                <div class="settings-btn-row">
+                  <button class="settings-btn settings-btn-primary" id="settings-github-connect">Connect GitHub</button>
+                  <button class="settings-btn settings-btn-danger" id="settings-github-disconnect" style="display:none">Disconnect</button>
+                  <span class="t-mono muted" id="settings-github-user" style="font-size:12px"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-group" id="github-repos-group" style="display:none">
+            <div class="settings-group-title">Default repository</div>
+            <p class="settings-desc">ALTAS will use this repo for github_action tool calls.</p>
+            <div class="github-repo-list" id="settings-github-repos"></div>
+            <div class="settings-group-title" style="margin-top:16px">Granted scopes</div>
+            <div class="github-scopes" id="settings-github-scopes">
+              <!-- Populated by settings.js after token validation -->
+            </div>
+          </div>
+        </div>
+
+        <!-- ── PANE: INTEGRATIONS ── -->
+        <div class="settings-pane" data-pane="integrations" id="pane-integrations" role="tabpanel">
+
+          <div class="settings-group">
+            <div class="settings-group-title">Notion</div>
+            <div class="integration-card">
+              <div class="integration-card-header">
+                <div class="integration-icon">
+                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="2" width="14" height="14" rx="2"/>
+                    <line x1="5" y1="6" x2="13" y2="6"/>
+                    <line x1="5" y1="9" x2="10" y2="9"/>
+                    <line x1="5" y1="12" x2="8" y2="12"/>
+                  </svg>
+                </div>
+                <div class="integration-info">
+                  <div class="integration-name">Notion</div>
+                  <div class="integration-desc">Connect your Notion workspace as a knowledge source</div>
+                </div>
+                <div class="integration-status disconnected" id="settings-notion-status">
+                  <div class="integration-status-dot"></div>Not connected
+                </div>
+              </div>
+              <div class="integration-card-body">
+                <div class="settings-field">
+                  <label class="settings-label" for="settings-notion-token">Integration token</label>
+                  <p class="settings-desc">Create at notion.so/my-integrations — starts with secret_</p>
+                  <input type="password" id="settings-notion-token" class="settings-input"
+                    placeholder="secret_xxxxxxxxxxxxxxxxxxxx" autocomplete="off" data-cursor="text"/>
+                </div>
+                <div class="settings-btn-row">
+                  <button class="settings-btn settings-btn-primary" id="settings-notion-connect">Save Notion token</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <div class="settings-group-title">Tools</div>
+            <div class="settings-row">
+              <div class="settings-row-label">
+                <div class="settings-label">Web search</div>
+                <p class="settings-desc">Allow ALTAS to search the web for current information</p>
+              </div>
+              <div class="settings-row-control">
+                <label class="settings-toggle" aria-label="Toggle web search">
+                  <input type="checkbox" id="settings-web-search" checked/>
+                  <div class="settings-toggle-track"><div class="settings-toggle-thumb"></div></div>
+                </label>
+              </div>
+            </div>
+            <div class="settings-row">
+              <div class="settings-row-label">
+                <div class="settings-label">Code execution</div>
+                <p class="settings-desc">Allow ALTAS to run code snippets in a sandbox</p>
+              </div>
+              <div class="settings-row-control">
+                <label class="settings-toggle" aria-label="Toggle code execution">
+                  <input type="checkbox" id="settings-code-run" checked/>
+                  <div class="settings-toggle-track"><div class="settings-toggle-thumb"></div></div>
+                </label>
+              </div>
+            </div>
+            <div class="settings-row">
+              <div class="settings-row-label">
+                <div class="settings-label">Calendar</div>
+                <p class="settings-desc">Allow ALTAS to read and create calendar events</p>
+              </div>
+              <div class="settings-row-control">
+                <label class="settings-toggle" aria-label="Toggle calendar">
+                  <input type="checkbox" id="settings-calendar" checked/>
+                  <div class="settings-toggle-track"><div class="settings-toggle-thumb"></div></div>
+                </label>
+              </div>
+            </div>
+            <div class="settings-row">
+              <div class="settings-row-label">
+                <div class="settings-label">Memory</div>
+                <p class="settings-desc">Allow ALTAS to store and recall facts between sessions</p>
+              </div>
+              <div class="settings-row-control">
+                <label class="settings-toggle" aria-label="Toggle memory">
+                  <input type="checkbox" id="settings-memory" checked/>
+                  <div class="settings-toggle-track"><div class="settings-toggle-thumb"></div></div>
+                </label>
+              </div>
+            </div>
+            <div class="settings-row">
+              <div class="settings-row-label">
+                <div class="settings-label">Notifications</div>
+                <p class="settings-desc">Allow ALTAS to send push notifications and reminders</p>
+              </div>
+              <div class="settings-row-control">
+                <label class="settings-toggle" aria-label="Toggle notifications">
+                  <input type="checkbox" id="settings-notifications"/>
+                  <div class="settings-toggle-track"><div class="settings-toggle-thumb"></div></div>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── PANE: APPEARANCE ── -->
+        <div class="settings-pane" data-pane="appearance" id="pane-appearance" role="tabpanel">
+          <div class="settings-group">
+            <div class="settings-group-title">Accent colour</div>
+            <div class="settings-field">
+              <div class="settings-label">Colour</div>
+              <p class="settings-desc">Primary accent colour used throughout the interface</p>
+              <div class="accent-color-grid" id="settings-accent-grid" role="radiogroup" aria-label="Choose accent colour"></div>
+            </div>
+          </div>
+          <div class="settings-group">
+            <div class="settings-group-title">Typography</div>
+            <div class="settings-row">
+              <div class="settings-row-label">
+                <div class="settings-label">Font size</div>
+                <p class="settings-desc">Base font size for chat messages</p>
+              </div>
+              <div class="settings-row-control">
+                <div class="settings-stepper">
+                  <button class="settings-stepper-btn" id="settings-font-down" aria-label="Decrease font size">−</button>
+                  <span class="settings-stepper-value" id="settings-fontsize-value">15px</span>
+                  <button class="settings-stepper-btn" id="settings-font-up" aria-label="Increase font size">+</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="settings-group">
+            <div class="settings-group-title">Motion &amp; density</div>
+            <div class="settings-row">
+              <div class="settings-row-label">
+                <div class="settings-label">Reduced motion</div>
+                <p class="settings-desc">Minimise animations and transitions</p>
+              </div>
+              <div class="settings-row-control">
+                <label class="settings-toggle" aria-label="Toggle reduced motion">
+                  <input type="checkbox" id="settings-reduced-motion"/>
+                  <div class="settings-toggle-track"><div class="settings-toggle-thumb"></div></div>
+                </label>
+              </div>
+            </div>
+            <div class="settings-row">
+              <div class="settings-row-label">
+                <div class="settings-label">Compact mode</div>
+                <p class="settings-desc">Reduce padding and spacing throughout the interface</p>
+              </div>
+              <div class="settings-row-control">
+                <label class="settings-toggle" aria-label="Toggle compact mode">
+                  <input type="checkbox" id="settings-compact-mode"/>
+                  <div class="settings-toggle-track"><div class="settings-toggle-thumb"></div></div>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── PANE: DANGER ZONE ── -->
+        <div class="settings-pane" data-pane="danger" id="pane-danger" role="tabpanel">
+          <div class="danger-zone">
+            <div class="danger-zone-title">Danger zone</div>
+            <div class="danger-action-row">
+              <div class="danger-action-text">
+                <div class="danger-action-label">Clear all memories</div>
+                <div class="danger-action-desc">Delete all entries stored in the ALTAS memory bank</div>
+              </div>
+              <button class="settings-btn settings-btn-danger" id="settings-clear-memory">Clear memories</button>
+            </div>
+            <div class="danger-action-row">
+              <div class="danger-action-text">
+                <div class="danger-action-label">Clear all conversations</div>
+                <div class="danger-action-desc">Delete your entire conversation history from this device</div>
+              </div>
+              <button class="settings-btn settings-btn-danger" id="settings-clear-conversations">Clear conversations</button>
+            </div>
+            <div class="danger-action-row">
+              <div class="danger-action-text">
+                <div class="danger-action-label">Reset ALTAS completely</div>
+                <div class="danger-action-desc">Delete all data including projects, memories, conversations and settings</div>
+              </div>
+              <button class="settings-btn settings-btn-danger" id="settings-clear-all">Reset everything</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── PANE: ABOUT ── -->
+        <div class="settings-pane" data-pane="about" id="pane-about" role="tabpanel">
+          <div class="about-hero">
+            <svg class="about-logo" viewBox="0 0 56 56" fill="none" aria-hidden="true">
+              <polygon points="28,3 51,16 51,40 28,53 5,40 5,16" fill="none" stroke="rgba(123,108,255,0.35)" stroke-width="0.75"/>
+              <polygon points="28,9 45,19 45,37 28,47 11,37 11,19" fill="none" stroke="rgba(123,108,255,0.2)" stroke-width="0.75"/>
+              <polygon points="28,15 39,21.5 39,34.5 28,41 17,34.5 17,21.5" fill="rgba(123,108,255,0.06)" stroke="rgba(123,108,255,0.4)" stroke-width="0.75"/>
+              <circle cx="28" cy="28" r="5.5" fill="#7B6CFF" opacity="0.9"/>
+              <circle cx="28" cy="28" r="3" fill="#C4BFFF"/>
+            </svg>
+            <div class="about-name">ALTAS</div>
+            <div class="about-version">v1.0.0 · Phase 1 MVP</div>
+            <p class="about-tagline">Adaptive · Logical · Tactical · Autonomous · Sentinel. Your personal AI second brain.</p>
+            <div class="about-stats">
+              <div class="about-stat"><div class="about-stat-value" id="about-memory-count">0</div><div class="about-stat-label">Memories</div></div>
+              <div class="about-stat"><div class="about-stat-value" id="about-conv-count">0</div><div class="about-stat-label">Conversations</div></div>
+              <div class="about-stat"><div class="about-stat-value" id="about-proj-count">0</div><div class="about-stat-label">Projects</div></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <!-- /settings-content-body -->
+    </div>
+    <!-- /settings-content -->
+
+  </div>
+  <!-- /settings-panel-shell -->
+</div>
+<!-- /settings-overlay -->
+
+
+<!-- New project modal -->
+<div id="new-project-modal" role="dialog" aria-modal="true" aria-label="Create new project" hidden>
+  <div class="new-project-backdrop" aria-hidden="true"></div>
+  <div class="new-project-dialog">
+    <div class="new-project-header">
+      <h2 class="new-project-title">New project</h2>
+      <button class="overlay-close" id="btn-cancel-project" aria-label="Cancel">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <line x1="2" y1="2" x2="12" y2="12"/><line x1="12" y1="2" x2="2" y2="12"/>
         </svg>
       </button>
     </div>
-
-    <div class="settings-body">
-      <!-- Backend URL -->
-      <div class="settings-group">
-        <label class="settings-label" for="setting-backend-url">Backend URL</label>
-        <p class="settings-desc muted">Your Railway deployment URL</p>
-        <input
-          type="url"
-          id="setting-backend-url"
-          class="settings-input"
-          placeholder="https://your-app.railway.app"
-          autocomplete="off"
-          spellcheck="false"
-        />
+    <div class="new-project-body">
+      <div class="new-project-group">
+        <label class="new-project-label" for="new-project-name">Project name *</label>
+        <input type="text" id="new-project-name" class="new-project-input" placeholder="e.g. ALTAS development" autocomplete="off" maxlength="60" data-cursor="text"/>
       </div>
-
-      <!-- System prompt -->
-      <div class="settings-group">
-        <label class="settings-label" for="setting-system-prompt">Custom instructions</label>
-        <p class="settings-desc muted">How ALTAS should behave and respond</p>
-        <textarea
-          id="setting-system-prompt"
-          class="settings-textarea"
-          rows="6"
-          placeholder="You are ALTAS, a personal AI assistant…"
-          spellcheck="true"
-        ></textarea>
+      <div class="new-project-group">
+        <label class="new-project-label" for="new-project-desc">Description</label>
+        <input type="text" id="new-project-desc" class="new-project-input" placeholder="What is this project about?" autocomplete="off" maxlength="140" data-cursor="text"/>
       </div>
+      <div class="new-project-group">
+        <div class="new-project-label">Colour</div>
+        <div class="project-color-picker" id="project-color-picker" role="radiogroup" aria-label="Project colour"></div>
+      </div>
+      <div class="new-project-group">
+        <div class="new-project-label">Icon</div>
+        <div class="project-icon-picker" id="project-icon-picker" role="radiogroup" aria-label="Project icon"></div>
+      </div>
+    </div>
+    <div class="new-project-footer">
+      <button class="new-project-btn-cancel" id="btn-cancel-project-footer">Cancel</button>
+      <button class="new-project-btn-create" id="btn-create-project">Create project</button>
+    </div>
+  </div>
+</div>
 
-      <!-- Temperature -->
-      <div class="settings-group">
-        <label class="settings-label" for="setting-temperature">
-          Temperature
-          <span class="settings-value-badge" id="temp-value">0.7</span>
-        </label>
-        <p class="settings-desc muted">Higher = more creative, lower = more precise</p>
-        <input
-          type="range"
-          id="setting-temperature"
-          class="settings-range"
-          min="0" max="1" step="0.05" value="0.7"
-          aria-valuemin="0" aria-valuemax="1" aria-valuenow="0.7"
-        />
-        <div class="settings-range-labels" aria-hidden="true">
-          <span>Precise</span>
-          <span>Balanced</span>
-          <span>Creative</span>
+<!-- Project workspace panel -->
+<div id="project-workspace" role="dialog" aria-modal="true" aria-label="Project workspace" hidden>
+  <div class="project-workspace-backdrop" aria-hidden="true"></div>
+  <div class="project-workspace-panel">
+    <div class="project-workspace-header">
+      <div class="project-workspace-color" id="workspace-project-color" aria-hidden="true"></div>
+      <div class="project-workspace-name" id="workspace-project-name">Project</div>
+      <div class="project-workspace-header-actions">
+        <button class="workspace-header-btn" id="workspace-set-active" aria-label="Set as active project">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="6" cy="6" r="5"/><path d="M3.5 6l2 2 3-3"/>
+          </svg>
+          Set active
+        </button>
+        <button class="workspace-header-btn danger" id="workspace-delete" aria-label="Delete project">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 3h10M4 3V2h4v1M10 3l-.7 8H2.7L2 3"/>
+          </svg>
+          Delete
+        </button>
+        <button class="workspace-close-btn" id="workspace-close" aria-label="Close workspace">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <line x1="2" y1="2" x2="11" y2="11"/><line x1="11" y1="2" x2="2" y2="11"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div class="workspace-tabs" role="tablist">
+      <button class="workspace-tab active" data-tab="conversations" role="tab" aria-selected="true">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M1 2a1 1 0 011-1h8a1 1 0 011 1v5a1 1 0 01-1 1H7l-3 2V8H2a1 1 0 01-1-1V2z"/>
+        </svg>
+        Conversations
+        <span class="workspace-tab-badge" id="workspace-conv-badge">0</span>
+      </button>
+      <button class="workspace-tab" data-tab="notes" role="tab" aria-selected="false">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 1h8a1 1 0 011 1v9a1 1 0 01-1 1H2a1 1 0 01-1-1V2a1 1 0 011-1z"/>
+          <line x1="3" y1="4" x2="9" y2="4"/><line x1="3" y1="6.5" x2="7" y2="6.5"/><line x1="3" y1="9" x2="6" y2="9"/>
+        </svg>
+        Notes
+      </button>
+      <button class="workspace-tab" data-tab="files" role="tab" aria-selected="false">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M7 1H3a1 1 0 00-1 1v8a1 1 0 001 1h6a1 1 0 001-1V5L7 1z"/>
+          <path d="M7 1v4h4"/>
+        </svg>
+        Files
+        <span class="workspace-tab-badge" id="workspace-file-badge">0</span>
+      </button>
+      <button class="workspace-tab" data-tab="context" role="tab" aria-selected="false">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="6" cy="6" r="5"/><line x1="6" y1="4" x2="6" y2="7"/><circle cx="6" cy="9" r="0.5" fill="currentColor" stroke="none"/>
+        </svg>
+        Context
+      </button>
+    </div>
+    <div class="workspace-content">
+      <div class="workspace-pane active" data-pane="conversations">
+        <div class="workspace-conv-list" id="workspace-conv-list" role="list" aria-label="Project conversations"></div>
+      </div>
+      <div class="workspace-pane" data-pane="notes">
+        <div class="workspace-notes-toolbar">
+          <button class="notes-toolbar-btn" aria-label="Bold"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M3 6h4a2 2 0 000-4H3v4zM3 6h4.5a2 2 0 010 4H3V6z"/></svg></button>
+          <button class="notes-toolbar-btn" aria-label="Italic"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><line x1="7" y1="2" x2="5" y2="10"/><line x1="4" y1="2" x2="8" y2="2"/><line x1="4" y1="10" x2="8" y2="10"/></svg></button>
+          <div class="notes-toolbar-sep" aria-hidden="true"></div>
+          <span class="notes-save-indicator" id="notes-save-indicator" aria-live="polite"></span>
+        </div>
+        <textarea id="workspace-notes-editor" placeholder="Take notes for this project…" spellcheck="true" data-cursor="text"></textarea>
+      </div>
+      <div class="workspace-pane" data-pane="files">
+        <div class="workspace-files-header">
+          <span class="workspace-files-title">Files</span>
+          <button class="btn-upload-file" id="btn-upload-file" aria-label="Upload file">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 1v7M4 3L6 1l2 2"/><path d="M1 10h10"/>
+            </svg>
+            Upload
+          </button>
+        </div>
+        <div class="file-drop-zone" id="workspace-file-drop" role="button" aria-label="Drop files here or click to upload" tabindex="0">
+          <div class="file-drop-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M15 11v4H3v-4M9 1v9M6 4L9 1l3 3"/>
+            </svg>
+          </div>
+          <div class="file-drop-label">Drop files here</div>
+          <div class="file-drop-hint">or click Upload — any file type</div>
+        </div>
+        <div class="workspace-file-list" id="workspace-file-list" role="list" aria-label="Project files"></div>
+        <input type="file" id="workspace-file-input" multiple style="display:none" aria-hidden="true"/>
+      </div>
+      <div class="workspace-pane" data-pane="context">
+        <p class="workspace-context-desc">Project context is injected into every ALTAS conversation while this project is active — like a persistent system prompt scoped to this project.</p>
+        <label class="settings-label" for="workspace-context-editor" style="margin-bottom:8px;display:block">Context / instructions</label>
+        <textarea id="workspace-context-editor" placeholder="e.g. This project is about building ALTAS. The stack is Python Flask + vanilla JS. Always suggest solutions compatible with this stack…" data-cursor="text"></textarea>
+        <div class="workspace-context-save">
+          <span class="t-mono muted" style="font-size:10px">Auto-saves as you type</span>
         </div>
       </div>
+    </div>
+  </div>
+</div>
 
-      <!-- Max tokens -->
-      <div class="settings-group">
-        <label class="settings-label" for="setting-max-tokens">
-          Max tokens
-          <span class="settings-value-badge" id="tokens-value">1024</span>
-        </label>
-        <p class="settings-desc muted">Maximum length of each response</p>
-        <input
-          type="range"
-          id="setting-max-tokens"
-          class="settings-range"
-          min="256" max="4096" step="256" value="1024"
-        />
-      </div>
-
-      <!-- Save button -->
-      <button class="settings-save-btn" id="settings-save">
-        Save settings
+<!-- Memory edit modal -->
+<div id="memory-edit-modal" role="dialog" aria-modal="true" aria-label="Edit memory entry" hidden>
+  <div class="memory-edit-backdrop" aria-hidden="true"></div>
+  <div class="memory-edit-dialog">
+    <div class="memory-edit-header">
+      <h2 class="memory-edit-title" id="memory-edit-title">Edit memory</h2>
+      <button class="overlay-close" id="memory-edit-close" aria-label="Close">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <line x1="2" y1="2" x2="12" y2="12"/><line x1="12" y1="2" x2="2" y2="12"/>
+        </svg>
       </button>
+    </div>
+    <div class="memory-edit-body">
+      <div class="memory-edit-group">
+        <label class="memory-edit-label" for="memory-edit-key">Key *</label>
+        <input type="text" id="memory-edit-key" class="memory-edit-input" placeholder="preferred_language" autocomplete="off" data-cursor="text"/>
+      </div>
+      <div class="memory-edit-group">
+        <label class="memory-edit-label" for="memory-edit-value">Value *</label>
+        <textarea id="memory-edit-value" class="memory-edit-textarea" placeholder="The value to remember…" rows="4" data-cursor="text"></textarea>
+      </div>
+      <div class="memory-edit-group">
+        <label class="memory-edit-label">Tags</label>
+        <div class="memory-tags-input-wrap" id="memory-tags-wrap">
+          <input type="text" class="memory-tags-text-input" id="memory-tags-input"
+            placeholder="Add tag then press Enter…" autocomplete="off" data-cursor="text"/>
+        </div>
+      </div>
+    </div>
+    <div class="memory-edit-footer">
+      <button class="memory-edit-btn-delete" id="memory-btn-delete" style="display:none" aria-label="Delete this memory entry">
+        <svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M1 2.5h9M3.5 2.5V2h4v.5M9 2.5l-.6 7H2.6L2 2.5"/>
+        </svg>
+        Delete
+      </button>
+      <button class="memory-edit-btn-cancel" id="memory-btn-cancel">Cancel</button>
+      <button class="memory-edit-btn-save"   id="memory-btn-save">Save memory</button>
     </div>
   </div>
 </div>
 
 
-<!-- ═══════════════════════════════════════════════════════════
-     ALTAS CUSTOM CURSOR SYSTEM
-     ═══════════════════════════════════════════════════════════ -->
-<div
-  id="altas-cursor"
-  class="state-default hidden"
-  aria-hidden="true"
-  role="presentation"
->
+<!-- ═══════════════════════════════════════════════════════
+     CUSTOM CURSOR
+     ═══════════════════════════════════════════════════════ -->
+<div id="altas-cursor" class="state-default hidden" aria-hidden="true" role="presentation">
   <div id="altas-cursor-dot"></div>
   <div id="altas-cursor-ring">
     <div id="altas-cursor-label" aria-hidden="true"></div>
@@ -1069,14 +1240,20 @@
 </div>
 
 
-<!-- ═══════════════════════════════════════════════════════════
-     SCRIPTS — dependency order
-     ui.js → api.js → chat.js → app.js
-     ═══════════════════════════════════════════════════════════ -->
-<script src="js/ui.js"></script>
-<script src="js/api.js"></script>
-<script src="js/chat.js"></script>
-<script src="js/app.js"></script>
+<!-- ═══════════════════════════════════════════════════════
+     SCRIPTS — dependency order:
+     ui.js → api.js → chat.js → slash.js → projects.js
+     → memory.js → settings.js → viz.js → app.js
+     ═══════════════════════════════════════════════════════ -->
+<script src="script/ui.js"></script>
+<script src="script/api.js"></script>
+<script src="script/chat.js"></script>
+<script src="script/slash.js"></script>
+<script src="script/projects.js"></script>
+<script src="script/memory.js"></script>
+<script src="script/settings.js"></script>
+<script src="script/viz.js"></script>
+<script src="script/app.js"></script>
 
 </body>
 </html>

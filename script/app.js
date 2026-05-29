@@ -68,7 +68,8 @@ const ALTASApp = (() => {
     /* Initialise UI subsystems (cursor, sidebar, settings, shortcuts) */
     ALTAS.Cursor.init();
     ALTAS.Sidebar.init();
-    ALTAS.Settings.init();
+    /* Settings already auto-initialised by settings.js on load */
+    /* ALTAS.Settings is the full ALTASSettings from settings.js */
     ALTAS.Shortcuts.init();
     ALTAS.Mode.init();
     ALTAS.Scroll.init(DOM.chatArea);
@@ -166,7 +167,7 @@ const ALTASApp = (() => {
 
     /* ── Settings save → update backend URL in API ── */
     document.addEventListener('altas:settings-saved', () => {
-      const s = ALTAS.Settings.getSettings();
+      const s = ALTAS.Settings.getConfig ? ALTAS.Settings.getConfig() : ALTAS.Settings.getSettings();
       ALTASAPI.setBackendUrl(s.backendUrl);
     });
 
@@ -273,7 +274,7 @@ const ALTASApp = (() => {
     const messages = ALTASChat.getMessages();
 
     /* Get settings */
-    const settings = ALTAS.Settings.getSettings();
+    const settings = ALTAS.Settings.getConfig ? ALTAS.Settings.getConfig() : ALTAS.Settings.getSettings();
 
     /* Show typing indicator */
     const typingEl = ALTASChat.showTypingIndicator();

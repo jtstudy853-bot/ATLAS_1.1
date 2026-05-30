@@ -23,7 +23,7 @@ from typing import Generator
 import anthropic
 import requests
 from dotenv import load_dotenv
-from flask import Flask, Response, request, jsonify, stream_with_context
+from flask import Flask, Response, request, jsonify, stream_with_context, send_from_directory
 
 load_dotenv()
 
@@ -97,6 +97,15 @@ def handle_preflight():
 # ═══════════════════════════════════════════════════════════════
 # ROUTES
 # ═══════════════════════════════════════════════════════════════
+
+@app.route("/")
+def index():
+    return send_from_directory(".", "index.html")
+
+@app.route("/<path:path>")
+def static_files(path):
+    return send_from_directory(".", path)
+
 
 @app.route("/ping", methods=["GET"])
 def ping():

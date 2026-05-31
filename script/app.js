@@ -8,6 +8,34 @@
 'use strict';
 
 /* ─────────────────────────────────────────────────────────────
+   EMERGENCY BOOT BYPASS
+   If any JS error prevents normal boot, this removes the
+   boot screen after 4 seconds no matter what.
+   ───────────────────────────────────────────────────────────── */
+setTimeout(() => {
+  const screen = document.getElementById('boot-screen');
+  const app    = document.getElementById('app');
+  if (screen) screen.remove();
+  if (app && !app.classList.contains('booted')) {
+    app.classList.add('booted');
+  }
+}, 4000);
+
+/* Global JS error logger — shows errors in a visible toast */
+window.addEventListener('error', (e) => {
+  console.error('ALTAS global error:', e.message, e.filename, e.lineno);
+  /* Remove boot screen so user isn't stuck */
+  const screen = document.getElementById('boot-screen');
+  const app    = document.getElementById('app');
+  if (screen) screen.remove();
+  if (app) app.classList.add('booted');
+});
+
+window.addEventListener('unhandledrejection', (e) => {
+  console.error('ALTAS unhandled promise rejection:', e.reason);
+});
+
+/* ─────────────────────────────────────────────────────────────
    1. APP STATE
    Single source of truth for the entire application
    ───────────────────────────────────────────────────────────── */

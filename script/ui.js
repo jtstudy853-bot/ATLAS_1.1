@@ -486,10 +486,11 @@ const ALTASBoot = (() => {
         });
       }
 
-      /* Boot screen fully removed from layout after transition */
-      screen.addEventListener('transitionend', () => {
-        screen.remove();
-      }, { once: true });
+      /* Remove boot screen — use transitionend with a hard timeout fallback
+         so it never gets permanently stuck if transition doesn't fire */
+      const removeScreen = () => screen.remove();
+      screen.addEventListener('transitionend', removeScreen, { once: true });
+      setTimeout(removeScreen, 1200); /* Hard fallback */
 
       onComplete?.();
     }, 1100);
